@@ -7,6 +7,10 @@ import (
 	"path/filepath"
 )
 
+// ProgramName specifies default program name
+// (for tempfiles, etc)
+var ProgramName = "gobenchui"
+
 func main() {
 	flag.Parse()
 	if len(flag.Args()) != 1 {
@@ -29,6 +33,19 @@ func main() {
 	}
 
 	commits, err := vcs.Commits()
+
+	newPath, err := CloneDir(path)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Couldn't clone dir:", err)
+		os.Exit(1)
+	}
+	defer func() {
+		err := os.RemoveAll(newPath)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Couldn't delete temp dir:", err)
+		}
+	}()
+	fmt.Println("Cloned package to", newPath)
 	fmt.Println(commits)
 }
 
