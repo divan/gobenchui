@@ -12,6 +12,7 @@ import (
 var ProgramName = "gobenchui"
 
 func main() {
+	bind := flag.String("bind", ":6222", "host:port to bind http server to")
 	flag.Parse()
 	if len(flag.Args()) != 1 {
 		Usage()
@@ -43,12 +44,13 @@ func main() {
 	fmt.Println("[DEBUG] Cloned package to", path)
 
 	// Remove temporary directory in the end
-	defer func() {
+	cleanup := func(path string) {
 		err := os.RemoveAll(path)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Couldn't delete temp dir:", err)
 		}
-	}()
+	}
+	defer cleanup(path)
 
 	// Prepare commits to run benchmarks agains
 	commits, err := vcs.Commits()
@@ -63,18 +65,21 @@ func main() {
 		return
 	}
 
-	fmt.Println("Benchmark results:")
-	for {
-		bench, ok := <-ch
-		if !ok {
-			break
+	go func() {
+		fmt.Println("Benchmark results:")
+		for {
+			bench, ok := <-ch
+			if !ok {
+				break
+			}
+			fmt.Println("Benchmark for commit", bench.Commit)
+			for k, v := range bench.Set {
+				fmt.Println(k, v)
+			}
 		}
-		fmt.Println("Benchmark for commit", bench.Commit)
-		for k, v := range bench.Set {
-			fmt.Println(k, v)
-		}
-	}
+	}()
 
+	fmt.Println(StartServer(*bind, ch))
 }
 
 // Usage prints program usage text.
