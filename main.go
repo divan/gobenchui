@@ -50,7 +50,14 @@ func main() {
 		}
 	}()
 
-	ch, err := RunBenchmarks(vcs)
+	// Prepare commits to run benchmarks agains
+	commits, err := vcs.Commits()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Couldn't get commits:", err)
+		return
+	}
+
+	ch, err := RunBenchmarks(vcs, commits)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Couldn't run benchmarks:", err)
 		return

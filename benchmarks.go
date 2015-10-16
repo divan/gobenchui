@@ -7,18 +7,15 @@ import (
 	"os"
 )
 
+// BenchmarkSet represents a set of benchmarks for single commit.
 type BenchmarkSet struct {
 	Commit Commit
 	Set    parse.Set
 }
 
-func RunBenchmarks(vcs VCS) (chan BenchmarkSet, error) {
+// RunBenchmarks loops over given commits and runs benchmarks for each of them.
+func RunBenchmarks(vcs VCS, commits []Commit) (chan BenchmarkSet, error) {
 	ch := make(chan BenchmarkSet)
-
-	commits, err := vcs.Commits()
-	if err != nil {
-		return nil, err
-	}
 
 	go func(commits []Commit) {
 		defer close(ch)
@@ -53,6 +50,7 @@ func RunBenchmarks(vcs VCS) (chan BenchmarkSet, error) {
 	return ch, nil
 }
 
+// ParseBenchmarkOutput parses raw output from 'go test -test.bench' command.
 func ParseBenchmarkOutput(out string) (*BenchmarkSet, error) {
 	buf := bytes.NewBufferString(out)
 	set, err := parse.ParseSet(buf)
