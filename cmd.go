@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
-	"strings"
 )
 
 // RunError represents command running error
@@ -14,7 +13,7 @@ type RunError struct {
 }
 
 // Run launches command in the given dir and handles success/errors.
-func Run(dir, command string, args ...string) ([]string, error) {
+func Run(dir, command string, args ...string) (string, error) {
 	cmd := exec.Command(command, args...)
 	cmd.Dir = dir
 
@@ -24,13 +23,13 @@ func Run(dir, command string, args ...string) ([]string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return nil, &RunError{
+		return "", &RunError{
 			Message: err.Error(),
 			Stderr:  stderr.String(),
 		}
 	}
 
-	return strings.Split(stdout.String(), "\n"), nil
+	return stdout.String(), nil
 }
 
 // Error implements error interface for RunError.

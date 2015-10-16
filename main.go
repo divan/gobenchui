@@ -32,21 +32,33 @@ func main() {
 		os.Exit(1)
 	}
 
-	commits, err := vcs.Commits()
-
 	newPath, err := CloneDir(path)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Couldn't clone dir:", err)
 		os.Exit(1)
 	}
+	fmt.Println("[DEBUG] Cloned package to", newPath)
+
+	// Replace VCS path with newly copied directory
+	vcs.SetPath(newPath)
+
+	// Remove temporary directory in the end
 	defer func() {
 		err := os.RemoveAll(newPath)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Couldn't delete temp dir:", err)
 		}
 	}()
-	fmt.Println("Cloned package to", newPath)
-	fmt.Println(commits)
+
+	ch, err := RunBenchmarks(vcs)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Couldn't run benchmarks:", err)
+		os.Exit(1)
+	}
+	out := <-ch
+	fmt.Println("Benchmark results:")
+	fmt.Println(out)
+
 }
 
 // Usage prints program usage text.

@@ -12,6 +12,8 @@ type VCS interface {
 	Commits() ([]Commit, error)
 	SwitchTo(hash string) error
 	PreviousCommit() string
+	Path() string
+	SetPath(path string)
 }
 
 // Commit represents single commit in VCS.
@@ -36,7 +38,7 @@ func GetVCS(path string) (VCS, error) {
 		return nil, err
 	}
 	vcs := &Git{
-		Path: path,
+		path: path,
 	}
 	return vcs, err
 }

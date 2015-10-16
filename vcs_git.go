@@ -9,18 +9,20 @@ import (
 
 // Git implements VCS for Git version control.
 type Git struct {
-	Path string
+	path string
 }
 
 // Commits returns all commits for the current branch. Implements VCS interface.
 func (g *Git) Commits() ([]Commit, error) {
-	out, err := Run(g.Path, "git", "log", `--pretty=format:"%H|%cd|%s|%cn %ce"`, `--date=rfc`)
+	out, err := Run(g.Path(), "git", "log", `--pretty=format:"%H|%cd|%s|%cn %ce"`, `--date=rfc`)
 	if err != nil {
 		return nil, err
 	}
 
+	lines := strings.Split(out, "\n")
+
 	var commits []Commit
-	for _, str := range out {
+	for _, str := range lines {
 		fields := strings.Split(str, "|")
 		if len(fields) != 4 {
 			fmt.Fprintln(os.Stderr, "Wrong commit info, skipping: %s", str)
@@ -48,4 +50,10 @@ func (g *Git) SwitchTo(hash string) error {
 }
 func (g *Git) PreviousCommit() string {
 	return ""
+}
+func (g *Git) Path() string {
+	return g.path
+}
+func (g *Git) SetPath(path string) {
+	g.path = path
 }
