@@ -53,11 +53,17 @@ func main() {
 	ch, err := RunBenchmarks(vcs)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Couldn't run benchmarks:", err)
-		os.Exit(1)
+		return
 	}
-	out := <-ch
+
 	fmt.Println("Benchmark results:")
-	fmt.Println(out)
+	for {
+		out, ok := <-ch
+		if !ok {
+			break
+		}
+		fmt.Println(out)
+	}
 
 }
 

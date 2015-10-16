@@ -14,7 +14,7 @@ type Git struct {
 
 // Commits returns all commits for the current branch. Implements VCS interface.
 func (g *Git) Commits() ([]Commit, error) {
-	out, err := Run(g.Path(), "git", "log", `--pretty=format:"%H|%cd|%s|%cn %ce"`, `--date=rfc`)
+	out, err := Run(g.Path(), "git", "log", `--pretty=format:%H|%cd|%s|%cn %ce`, `--date=rfc`)
 	if err != nil {
 		return nil, err
 	}
