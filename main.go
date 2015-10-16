@@ -19,7 +19,7 @@ func main() {
 	}
 
 	pkg := flag.Arg(0)
-	path, err := getPath(pkg)
+	path, err := getAbsPath(pkg)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to find package:", err)
 		os.Exit(1)
@@ -73,10 +73,10 @@ func Usage() {
 	flag.PrintDefaults()
 }
 
-// getPath returns absolute path to package to be benchmarked.
+// getAbsPath returns absolute path to package to be benchmarked.
 // For package names it looks for them in GOPATH.
 // For '.' it resolves current working directory.
-func getPath(pkg string) (string, error) {
+func getAbsPath(pkg string) (string, error) {
 	if pkg == "." {
 		return os.Getwd()
 	}

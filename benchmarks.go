@@ -34,6 +34,7 @@ func RunBenchmarks(vcs VCS) (chan Benchmark, error) {
 			}
 			ch <- Benchmark(out)
 		}
+		close(ch)
 	}(commits)
 
 	return ch, nil
