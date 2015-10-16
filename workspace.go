@@ -9,16 +9,42 @@ import (
 	"strings"
 )
 
-// CloneDir copies directory under path into
-// temporary system directory and returns new
-// path.
-func CloneDir(path string) (string, error) {
+// Workspace represents local VCS workspace.
+type Workspace struct {
+	path string
+}
+
+// NewWorkspace creates new Workspace.
+func NewWorkspace(path string) *Workspace {
+	return &Workspace{
+		path: path,
+	}
+}
+
+// Path returns local workspace path.
+func (w *Workspace) Path() string {
+	return w.path
+}
+
+// SetPath sets new path for workspace.
+func (w *Workspace) SetPath(path string) {
+	w.path = path
+}
+
+// Clone copies whole workspace to temporary directory.
+func (w *Workspace) Clone() error {
 	tmp, err := ioutil.TempDir("", ProgramName)
 	if err != nil {
-		return "", err
+		return err
 	}
-	err = copyAll(tmp+"/", path)
-	return tmp, err
+
+	err = copyAll(tmp+"/", w.Path())
+	if err != nil {
+		return err
+	}
+	w.SetPath(tmp)
+
+	return nil
 }
 
 // copyFile copies the file with path src to dst. The new file must not exist.

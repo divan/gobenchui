@@ -16,17 +16,18 @@ func RunBenchmarks(vcs VCS) (chan Benchmark, error) {
 	}
 
 	go func(commits []Commit) {
+		path := vcs.Workspace().Path()
 		for _, commit := range commits {
 			// Switch to previous commit
 			fmt.Printf("Switching to |%s|\n", commit.Hash)
-			_, err := Run(vcs.Path(), "git", "checkout", commit.Hash)
+			_, err := Run(path, "git", "checkout", commit.Hash)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
 
 			// Run benchmark for this commit
-			out, err := Run(vcs.Path(), "go", "test", "-test.bench", ".")
+			out, err := Run(path, "go", "test", "-test.bench", ".")
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return

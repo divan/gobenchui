@@ -26,25 +26,25 @@ func main() {
 	}
 	fmt.Println("Benchmarking package", path)
 
-	vcs, err := GetVCS(path)
+	// only git so far
+	var vcs VCS
+	vcs, err = NewGitVCS(path)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "package isn't under any supported VCS, so no benchmarks to compare\n")
 		os.Exit(1)
 	}
 
-	newPath, err := CloneDir(path)
+	err = vcs.Workspace().Clone()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Couldn't clone dir:", err)
 		os.Exit(1)
 	}
-	fmt.Println("[DEBUG] Cloned package to", newPath)
-
-	// Replace VCS path with newly copied directory
-	vcs.SetPath(newPath)
+	path = vcs.Workspace().Path()
+	fmt.Println("[DEBUG] Cloned package to", path)
 
 	// Remove temporary directory in the end
 	defer func() {
-		err := os.RemoveAll(newPath)
+		err := os.RemoveAll(path)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Couldn't delete temp dir:", err)
 		}
