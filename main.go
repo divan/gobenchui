@@ -58,11 +58,14 @@ func main() {
 
 	fmt.Println("Benchmark results:")
 	for {
-		out, ok := <-ch
+		bench, ok := <-ch
 		if !ok {
 			break
 		}
-		fmt.Println(out)
+		fmt.Println("Benchmark for commit", bench.Commit)
+		for k, v := range bench.Set {
+			fmt.Println(k, v)
+		}
 	}
 
 }
