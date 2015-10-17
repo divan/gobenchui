@@ -1,23 +1,29 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"net/http"
 	"os/exec"
 	"runtime"
 )
 
+var indexTmpl = template.Must(template.ParseFiles("assets/index.html"))
+
 // StartServer starts http-server and servers frontend code
 // for benchmark results display.
 func StartServer(bind string, ch chan BenchmarkSet) error {
 	http.HandleFunc("/", handler)
+
 	go StartBrowser("http://localhost" + bind)
 	return http.ListenAndServe(bind, nil)
 }
 
 // handler handles index page.
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello")
+	err := indexTmpl.Execute(w, nil)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 // StartBrowser tries to open the URL in a browser
