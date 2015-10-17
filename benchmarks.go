@@ -9,8 +9,8 @@ import (
 
 // BenchmarkSet represents a set of benchmarks for single commit.
 type BenchmarkSet struct {
-	Commit Commit
-	Set    parse.Set
+	Commit Commit    `json:"commit"`
+	Set    parse.Set `json:"set"`
 }
 
 // RunBenchmarks loops over given commits and runs benchmarks for each of them.

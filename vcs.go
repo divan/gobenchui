@@ -17,8 +17,8 @@ type VCS interface {
 // Author is the last person touched this commit
 // (committer in git terms)
 type Commit struct {
-	Hash    string
-	Author  string
-	Subject string
-	Date    time.Time
+	Hash    string    `json:"hash"`
+	Author  string    `json:"author"`
+	Subject string    `json:"subject"`
+	Date    time.Time `json:"date"`
 }

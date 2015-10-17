@@ -33,7 +33,7 @@ func NewGitVCS(path string) (*Git, error) {
 // Commits returns all commits for the current branch. Implements VCS interface.
 func (g *Git) Commits() ([]Commit, error) {
 	path := g.Workspace().Path()
-	out, err := Run(path, "git", "log", `--pretty=format:%H|%cd|%s|%cn %ce`, `--date=rfc`)
+	out, err := Run(path, "git", "log", `--pretty=format:%H|%cd|%s|%cn <%ce>`, `--date=rfc`)
 	if err != nil {
 		return nil, err
 	}

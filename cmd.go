@@ -35,8 +35,8 @@ func Run(dir, command string, args ...string) (string, error) {
 // Error implements error interface for RunError.
 func (r *RunError) Error() string {
 	if r.Stderr != "" {
-		return fmt.Sprintf("git failed: %s", r.Stderr)
+		return fmt.Sprintf("failed: %s", r.Stderr)
 	} else {
-		return fmt.Sprintf("git failed: %s", r.Message)
+		return fmt.Sprintf("failed: %s", r.Message)
 	}
 }

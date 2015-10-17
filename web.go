@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -35,9 +36,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 // wshandler is a handler for websocket connection.
 func wshandler(ws *websocket.Conn, ch chan BenchmarkSet) {
 	for set := range ch {
-		fmt.Println("[DEBUG] WebSocket sending")
-		_, err := ws.Write([]byte("Benchmark for " + set.Commit.Hash))
-		fmt.Println("[DEBUG] WebSocket send", err)
+		data, err := json.MarshalIndent(set, "  ", "    ")
+		if err != nil {
+			fmt.Println("[ERROR] JSON encoding failed", err)
+			continue
+		}
+
+		_, err = ws.Write(data)
+		if err != nil {
+			fmt.Println("[ERROR] WebSocket send failed", err)
+			continue
+		}
 	}
 
 	fmt.Println("[DEBUG] Closing connection")
