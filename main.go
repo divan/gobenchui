@@ -66,20 +66,6 @@ func main() {
 		return
 	}
 
-	go func() {
-		fmt.Println("Benchmark results:")
-		for {
-			bench, ok := <-ch
-			if !ok {
-				break
-			}
-			fmt.Println("Benchmark for commit", bench.Commit)
-			for k, v := range bench.Set {
-				fmt.Println(k, v)
-			}
-		}
-	}()
-
 	go StartServer(*bind, ch)
 
 	sigCh := make(chan os.Signal, 1)
