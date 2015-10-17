@@ -3,7 +3,7 @@
 <body>
     <script type="text/javascript">
         var sock = null;
-        var wsuri = "ws://127.0.0.1:6222";
+        var wsuri = "ws://127.0.0.1:6222/ws";
 
         window.onload = function() {
 
@@ -21,20 +21,14 @@
 
             sock.onmessage = function(e) {
                 console.log("message received: " + e.data);
+				var div = document.createElement('div');
+				div.className = 'row';
+				div.innerHTML = '<h5>'+e.data+'</h5>';
+				document.getElementById('output').appendChild(div);
             }
         };
-
-        function send() {
-            var msg = document.getElementById('message').value;
-            sock.send(msg);
-        };
     </script>
-    <h1>WebSocket Echo Test</h1>
-    <form>
-        <p>
-            Message: <input id="message" type="text" value="Hello, world!">
-        </p>
-    </form>
-    <button onclick="send();">Send Message</button>
+    <h1>WebSocket Test</h1>
+	<div id="output"></div>
 </body>
 </html>

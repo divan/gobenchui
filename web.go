@@ -1,10 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"os/exec"
 	"runtime"
+	"time"
+
+	"golang.org/x/net/websocket"
 )
 
 var indexTmpl = template.Must(template.ParseFiles("assets/index.html"))
@@ -13,6 +17,7 @@ var indexTmpl = template.Must(template.ParseFiles("assets/index.html"))
 // for benchmark results display.
 func StartServer(bind string, ch chan BenchmarkSet) error {
 	http.HandleFunc("/", handler)
+	http.Handle("/ws", websocket.Handler(wshandler))
 
 	go StartBrowser("http://localhost" + bind)
 	return http.ListenAndServe(bind, nil)
@@ -23,6 +28,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	err := indexTmpl.Execute(w, nil)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+// wshandler is a handler for websocket connection.
+func wshandler(ws *websocket.Conn) {
+	for {
+		_, err := ws.Write([]byte("Some info from server"))
+		fmt.Println("[DEBUG] WebSocket send", err)
+		_ = err
+		time.Sleep(1 * time.Second)
 	}
 }
 
