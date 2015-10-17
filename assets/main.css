@@ -28,3 +28,11 @@ h3 {
 	line-height: 20px;
 	margin: 0 0 20px;
 }
+
+h5 {
+	font-family: 'Helvetica Neue', 'Open Sans', sans-serif;
+	font-size: 14px;
+	font-weight: 300;
+	line-height: 14px;
+	margin: 0 0 14px;
+}
