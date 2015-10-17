@@ -41,7 +41,7 @@ func (g *Git) Commits() ([]Commit, error) {
 	args := []string{"log", `--pretty=format:%H|%cd|%s|%cn <%ce>`, `--date=rfc`}
 	if len(g.filter.Args) > 0 {
 		// Append custom arguments, excluding formatting-related ones
-		cleanedArgs := g.cleanArgs(g.filter.Args...)
+		cleanedArgs := cleanGitArgs(g.filter.Args...)
 		args = append(args, cleanedArgs...)
 	}
 
@@ -106,20 +106,25 @@ var (
 	}
 )
 
-// cleanArgs cleans user defined custom git arguments.
+// cleanGitArgs cleans user defined custom git arguments.
 // it basically removes arguments, that may affect formatting
 // output (we use specific format for parsing results)
-func (*Git) cleanArgs(args ...string) []string {
+func cleanGitArgs(args ...string) []string {
 	var ret []string
 	for _, arg := range args {
-		for _, ignored := range ignoredGitArgs {
-			if strings.HasPrefix(arg, ignored) {
-				continue
-			}
+		trimmed := strings.TrimSpace(arg)
+		if trimmed == "" {
+			continue
 		}
 
-		if trimmed := strings.TrimSpace(arg); trimmed != "" {
-			ret = append(ret, arg)
+		var ignore bool
+		for _, ignored := range ignoredGitArgs {
+			if strings.HasPrefix(trimmed, ignored) {
+				ignore = true
+			}
+		}
+		if !ignore {
+			ret = append(ret, trimmed)
 		}
 	}
 	return ret
