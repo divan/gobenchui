@@ -8,13 +8,19 @@ import (
 	"path/filepath"
 )
 
-// ProgramName specifies default program name
-// (for tempfiles, etc)
-var ProgramName = "gobenchui"
+var (
+	// ProgramName specifies default program name
+	// (for tempfiles, etc)
+	ProgramName = "gobenchui"
+
+	bind      = flag.String("bind", ":6222", "host:port to bind http server to")
+	vcsArgs   = flag.String("vcsArgs", "", "Additional args for vcs command (git, hg, etc)")
+	benchArgs = flag.String("benchArgs", "", "Custom 'go test' flags")
+	lastN     = flag.Int64("n", 0, "Last N commits only")
+	max       = flag.Int64("max", 0, "Maximum commits (distribute evenly)")
+)
 
 func main() {
-	bind := flag.String("bind", ":6222", "host:port to bind http server to")
-	benchOpts := flag.String("benchOpts", "", "Custom 'go test' flags")
 	flag.Parse()
 	if len(flag.Args()) != 1 {
 		Usage()
@@ -31,7 +37,8 @@ func main() {
 
 	// only git so far
 	var vcs VCS
-	vcs, err = NewGitVCS(path)
+	filter := NewFilterOptions(*lastN, *max, *vcsArgs)
+	vcs, err = NewGitVCS(path, *filter)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "package isn't under any supported VCS, so no benchmarks to compare\n")
 		os.Exit(1)
@@ -63,7 +70,7 @@ func main() {
 
 	resultCh, runCh := RunBenchmarks(vcs, commits)
 
-	info := NewInfo(pkg, path, vcs.Name(), *benchOpts, commits)
+	info := NewInfo(pkg, path, vcs.Name(), *benchArgs, commits)
 	info.SetStatus(InProgress)
 
 	// There is basically no reason to make this channel
