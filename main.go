@@ -14,6 +14,7 @@ var ProgramName = "gobenchui"
 
 func main() {
 	bind := flag.String("bind", ":6222", "host:port to bind http server to")
+	benchOpts := flag.String("benchOpts", "", "Custom 'go test' flags")
 	flag.Parse()
 	if len(flag.Args()) != 1 {
 		Usage()
@@ -41,8 +42,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Couldn't clone dir:", err)
 		os.Exit(1)
 	}
-	path = vcs.Workspace().Path()
-	fmt.Println("[DEBUG] Cloned package to", path)
+	clonedPath := vcs.Workspace().Path()
+	fmt.Println("[DEBUG] Cloned package to", clonedPath)
 
 	// Remove temporary directory in the end
 	cleanup := func(path string) {
@@ -51,7 +52,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Couldn't delete temp dir:", err)
 		}
 	}
-	defer cleanup(path)
+	defer cleanup(clonedPath)
 
 	// Prepare commits to run benchmarks agains
 	commits, err := vcs.Commits()
@@ -66,7 +67,9 @@ func main() {
 		return
 	}
 
-	go StartServer(*bind, ch)
+	info := NewInfo(pkg, path, vcs.Name(), *benchOpts, commits)
+
+	go StartServer(*bind, ch, info)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, os.Kill)

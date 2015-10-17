@@ -6,17 +6,20 @@ import (
 	"html/template"
 	"net/http"
 	"os/exec"
+	"reflect"
 	"runtime"
 
 	"golang.org/x/net/websocket"
 )
 
-var indexTmpl = template.Must(template.ParseFiles("assets/index.html"))
-
 // StartServer starts http-server and servers frontend code
 // for benchmark results display.
-func StartServer(bind string, ch chan BenchmarkSet) error {
-	http.HandleFunc("/", handler)
+func StartServer(bind string, ch chan BenchmarkSet, info *Info) error {
+	fs := http.FileServer(http.Dir("assets"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler(w, r, info)
+	}))
 	http.Handle("/ws", websocket.Handler(func(ws *websocket.Conn) {
 		wshandler(ws, ch)
 	}))
@@ -26,10 +29,14 @@ func StartServer(bind string, ch chan BenchmarkSet) error {
 }
 
 // handler handles index page.
-func handler(w http.ResponseWriter, r *http.Request) {
-	err := indexTmpl.Execute(w, nil)
+func handler(w http.ResponseWriter, r *http.Request, info *Info) {
+	t := template.Must(template.New("index.html").Funcs(funcs).ParseFiles("assets/index.html"))
+
+	err := t.Execute(w, info)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println("[ERROR] failed to render template:", err)
+		return
 	}
 }
 
@@ -70,4 +77,17 @@ func StartBrowser(url string) bool {
 	}
 	cmd := exec.Command(args[0], append(args[1:], url)...)
 	return cmd.Start() == nil
+}
+
+// funcs for index template
+var funcs = template.FuncMap{
+	"last": func(a interface{}) interface{} {
+		v := reflect.ValueOf(a)
+		switch v.Kind() {
+		case reflect.Slice, reflect.Array:
+			return v.Index(v.Len() - 1).Interface()
+		default:
+			return nil
+		}
+	},
 }

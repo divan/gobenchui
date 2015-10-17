@@ -4,11 +4,7 @@
 	<script src="http://momentjs.com/downloads/moment.js"></script>
 	<script src="http://code.highcharts.com/highcharts.js"></script>
 	<script src="http://code.highcharts.com/modules/exporting.js"></script>
-	<style type="text/css">
-	body {
-		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	}
-	</style>
+	<link rel="stylesheet" type="text/css" href="/static/main.css">
 </head>
 <body>
     <script type="text/javascript">
@@ -98,7 +94,16 @@
         };
 
     </script>
-    <h1>Benchmark History</h1>
+    <h1>Go Benchmark UI</h1>
+	<div style="float: right">
+		<h2>{{ len .Commits }} commits</h2>
+		<h3>{{ with last .Commits}}{{ .Date.Format "2006-01-02" }}{{ end }} - {{ with index .Commits 1 }}{{ .Date.Format "2006-01-02" }}{{ end }}</h3>
+	</div>
+	<div style="float: left">
+		<h2>{{ .PkgName }}</h2>
+		<h3>Path: {{ .PkgPath }}</h3>
+	</div>
 	<div id="container"></div>
+
 </body>
 </html>

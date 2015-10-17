@@ -75,3 +75,8 @@ func (g *Git) SwitchTo(hash string) error {
 func (g *Git) Workspace() *Workspace {
 	return g.workspace
 }
+
+// Name returns vcs common name. Implements VCS interface.
+func (*Git) Name() string {
+	return "git"
+}

@@ -10,6 +10,7 @@ type VCS interface {
 	Commits() ([]Commit, error)
 	SwitchTo(hash string) error
 	Workspace() *Workspace
+	Name() string
 }
 
 // Commit represents single commit in VCS.

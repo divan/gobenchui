@@ -1,0 +1,30 @@
+body {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+h1 {
+	font-family: 'Helvetica Neue', 'Open Sans', sans-serif;
+	font-size: 50px;
+	font-weight: 300;
+	line-height: 32px;
+	margin: 20px 0 20px;
+	text-align: center;
+}
+
+h2 {
+	color: #111;
+	font-family: 'Helvetica Neue', 'Open Sans', sans-serif;
+	font-size: 28px;
+	font-weight: 200;
+	line-height: 22px;
+	margin: 0 0 10px;
+}
+
+h3 {
+	color: #111;
+	font-family: 'Helvetica Neue', 'Open Sans', sans-serif;
+	font-size: 22px;
+	font-weight: 100;
+	line-height: 22px;
+	margin: 0 0 22px;
+}
