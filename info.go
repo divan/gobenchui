@@ -29,6 +29,8 @@ type Info struct {
 	BenchOptions string
 	Commits      []Commit
 
+	BenchResults []BenchmarkSet
+
 	StartTime time.Time
 	EndTime   time.Time
 }
@@ -36,6 +38,8 @@ type Info struct {
 // NewInfo returns new initialized info.
 func NewInfo(pkg, path, vcs, benchopts string, commits []Commit) *Info {
 	return &Info{
+		mx: &sync.RWMutex{},
+
 		Status:   Undefined,
 		Progress: 0.0,
 
@@ -65,4 +69,11 @@ func (i *Info) SetStatus(status Status) {
 	if status == Finished {
 		i.EndTime = time.Now()
 	}
+}
+
+// AddResults inserts new BenchmarkSet result to Info.
+func (i *Info) AddResult(b BenchmarkSet) {
+	i.mx.Lock()
+	defer i.mx.Unlock()
+	i.BenchResults = append(i.BenchResults, b)
 }

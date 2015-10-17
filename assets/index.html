@@ -25,45 +25,49 @@
 						sock.onmessage = function(e) {
 							msg = JSON.parse(e.data);
 
-							$.each(msg.set, function(key, value) {
-								var bench = value[0];
-								date = moment(msg.commit.date).format('YYYY-MM-DD HH:mm:ss');
+							console.log(msg);
+							if (msg.type === "result") {
+								result = msg.result;
+								$.each(result.set, function(key, value) {
+									var bench = value[0];
+									date = moment(result.commit.date).format('YYYY-MM-DD HH:mm:ss');
 
-								item = {
-									name: date,
-									y: bench.NsPerOp,
-								};
+									item = {
+										name: date,
+										y: bench.NsPerOp,
+									};
 
-								var series = self.get(bench.Name);
-								console.log("Series", series);
-								if (series) { // series already exists
-									series.addPoint(item, true, series.data.length > 25);
-								} else { //  new series
-									self.addSeries({
-										data: [item],
-										id: bench.Name,
-										name: bench.Name,
-									});
-								}
-							});
-
-							// Now, iterate over known series, and insert nulls
-							// if values are missing.
-							$.each(self.series, function(index, serie) {
-								found = false;
-								$.each(serie.data, function(idx, item) {
-									if (item.name == date) {
-										found = true;
-										return false;
+									var series = self.get(bench.Name);
+									console.log("Series", series);
+									if (series) { // series already exists
+										series.addPoint(item, true, series.data.length > 25);
+									} else { //  new series
+										self.addSeries({
+											data: [item],
+											id: bench.Name,
+											name: bench.Name,
+										});
 									}
 								});
-								if (!found) {
-									serie.addPoint({
-										name: date,
-										y: null,
-									}, true, serie.data.length > 25)
-								};
-							});
+
+								// Now, iterate over known series, and insert nulls
+								// if values are missing.
+								$.each(self.series, function(index, serie) {
+									found = false;
+									$.each(serie.data, function(idx, item) {
+										if (item.name == date) {
+											found = true;
+											return false;
+										}
+									});
+									if (!found) {
+										serie.addPoint({
+											name: date,
+											y: null,
+										}, true, serie.data.length > 25)
+									};
+								});
+							}
 						}
 					},
 				},

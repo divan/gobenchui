@@ -61,15 +61,34 @@ func main() {
 		return
 	}
 
-	ch, err := RunBenchmarks(vcs, commits)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Couldn't run benchmarks:", err)
-		return
-	}
+	resultCh, runCh := RunBenchmarks(vcs, commits)
 
 	info := NewInfo(pkg, path, vcs.Name(), *benchOpts, commits)
+	info.SetStatus(InProgress)
 
-	go StartServer(*bind, ch, info)
+	// There is basically no reason to make this channel
+	// buffered, but just in case, if web frontend code will
+	// stuck (websocket js issue or smth.), results will
+	// still be saved into info, so the page reload will
+	// show all results.
+	webCh := make(chan BenchmarkSet, 256)
+	go func() {
+		for {
+			select {
+			case result, ok := <-resultCh:
+				if !ok {
+					info.SetStatus(Finished)
+					return
+				}
+				info.AddResult(result)
+				info.SetStatus(InProgress)
+
+				webCh <- result
+			}
+		}
+	}()
+
+	go StartServer(*bind, webCh, runCh, info)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, os.Kill)
