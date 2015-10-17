@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os/exec"
 	"runtime"
-	"time"
 
 	"golang.org/x/net/websocket"
 )
@@ -17,7 +16,9 @@ var indexTmpl = template.Must(template.ParseFiles("assets/index.html"))
 // for benchmark results display.
 func StartServer(bind string, ch chan BenchmarkSet) error {
 	http.HandleFunc("/", handler)
-	http.Handle("/ws", websocket.Handler(wshandler))
+	http.Handle("/ws", websocket.Handler(func(ws *websocket.Conn) {
+		wshandler(ws, ch)
+	}))
 
 	go StartBrowser("http://localhost" + bind)
 	return http.ListenAndServe(bind, nil)
@@ -32,19 +33,21 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 // wshandler is a handler for websocket connection.
-func wshandler(ws *websocket.Conn) {
-	for {
-		_, err := ws.Write([]byte("Some info from server"))
+func wshandler(ws *websocket.Conn, ch chan BenchmarkSet) {
+	for set := range ch {
+		fmt.Println("[DEBUG] WebSocket sending")
+		_, err := ws.Write([]byte("Benchmark for " + set.Commit.Hash))
 		fmt.Println("[DEBUG] WebSocket send", err)
-		_ = err
-		time.Sleep(1 * time.Second)
 	}
+
+	fmt.Println("[DEBUG] Closing connection")
+	ws.Close()
 }
 
 // StartBrowser tries to open the URL in a browser
 // and reports whether it succeeds.
 //
-// Orig code: golang.org/x/tools/cmd/cover/html.go
+// Orig. code: golang.org/x/tools/cmd/cover/html.go
 func StartBrowser(url string) bool {
 	// try to start the browser
 	var args []string
