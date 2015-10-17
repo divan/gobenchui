@@ -1,10 +1,13 @@
+//go:generate go-bindata-assetfs assets/...
 package main
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elazarl/go-bindata-assetfs"
 	"html/template"
 	"net/http"
+	"os"
 	"os/exec"
 	"reflect"
 	"runtime"
@@ -13,12 +16,24 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// indexTmpl is a html template for index page.
+var indexTmpl *template.Template
+
+func init() {
+	indexTmpl = prepareTemplate()
+}
+
 // StartServer starts http-server and servers frontend code
 // for benchmark results display.
 func StartServer(bind string, resCh chan BenchmarkSet, runCh chan BenchmarkRun, info *Info) error {
 	// Handle static files
-	fs := http.FileServer(http.Dir("assets"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	var fs http.FileSystem
+	if DevMode() {
+		fs = http.Dir("assets")
+	} else {
+		fs = &assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, Prefix: "assets"}
+	}
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(fs)))
 
 	// Index page handler
 	http.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -37,9 +52,7 @@ func StartServer(bind string, resCh chan BenchmarkSet, runCh chan BenchmarkRun, 
 
 // handler handles index page.
 func handler(w http.ResponseWriter, r *http.Request, info *Info) {
-	t := template.Must(template.New("index.html").Funcs(funcs).ParseFiles("assets/index.html"))
-
-	err := t.Execute(w, info)
+	err := indexTmpl.Execute(w, info)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Println("[ERROR] failed to render template:", err)
@@ -142,4 +155,26 @@ var funcs = template.FuncMap{
 			return nil
 		}
 	},
+}
+
+// DevMode returns true if app is running in development mode.
+func DevMode() bool {
+	devMode := os.Getenv("GOBENCHUI_DEV")
+	return devMode != ""
+}
+
+// prepareTemplate prepares and parses template.
+func prepareTemplate() *template.Template {
+	t := template.New("index.html").Funcs(funcs)
+
+	// read from local filesystem for development
+	if DevMode() {
+		return template.Must(t.ParseFiles("assets/index.html"))
+	}
+
+	data, err := Asset("assets/index.html")
+	if err != nil {
+		panic(err)
+	}
+	return template.Must(t.Parse(string(data)))
 }
