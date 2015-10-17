@@ -81,7 +81,10 @@ func wshandler(ws *websocket.Conn, resCh chan BenchmarkSet, runCh chan Benchmark
 		select {
 		case status, ok := <-runCh:
 			if !ok {
-				return
+				runCh = nil
+				if resCh == nil {
+					return
+				}
 			}
 			data := WSData{
 				Type:      "status",
@@ -94,7 +97,10 @@ func wshandler(ws *websocket.Conn, resCh chan BenchmarkSet, runCh chan Benchmark
 			_ = sendJSON(ws, data)
 		case set, ok := <-resCh:
 			if !ok {
-				return
+				resCh = nil
+				if runCh == nil {
+					return
+				}
 			}
 			data := WSData{
 				Type:   "result",

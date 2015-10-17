@@ -54,7 +54,7 @@ func RunBenchmarks(vcs VCS, commits []Commit) (chan BenchmarkSet, chan Benchmark
 
 			// Run benchmark for this commit
 			// TODO: make it command agnostic (for gb and others)
-			out, err := Run(path, "go", "test", "-test.bench", ".")
+			out, err := Run(path, "go", "test", "-run", "XXXXXX", "-bench", ".")
 			if err != nil {
 				handleError(err, run, runCh)
 				return

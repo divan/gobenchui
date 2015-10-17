@@ -43,7 +43,7 @@
 									var series = self.get(bench.Name);
 									console.log("Series", series);
 									if (series) { // series already exists
-										series.addPoint(item, true, series.data.length > 25);
+										series.addPoint(item, true, false);
 									} else { //  new series
 										self.addSeries({
 											data: [item],
@@ -67,7 +67,7 @@
 										serie.addPoint({
 											name: date,
 											y: null,
-										}, true, serie.data.length > 25)
+										}, true, false)
 									};
 								});
 							}
