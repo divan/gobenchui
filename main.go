@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 )
 
@@ -79,7 +80,12 @@ func main() {
 		}
 	}()
 
-	fmt.Println(StartServer(*bind, ch))
+	go StartServer(*bind, ch)
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, os.Kill)
+	<-sigCh
+	fmt.Println("Got signal, cleaning up")
 }
 
 // Usage prints program usage text.
