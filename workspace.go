@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -51,8 +51,10 @@ func (w *Workspace) Clone() error {
 		return err
 	}
 
+	fmt.Println("[DEBUG] Cloning git workspace to", tmp)
 	err = copyAll(tmp+"/", w.Root())
 	if err != nil {
+		os.RemoveAll(tmp)
 		return err
 	}
 	w.SetPath(tmp)
@@ -73,7 +75,7 @@ func copyFile(dst, src string) error {
 		return err
 	}
 	if rstat.IsDir() {
-		return errors.New("dir argument to CopyFile")
+		return fmt.Errorf("dir argument to CopyFile (%s, %s)", dst, src)
 	}
 
 	wf, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_EXCL, rstat.Mode())

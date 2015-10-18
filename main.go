@@ -49,8 +49,6 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Couldn't clone dir:", err)
 		os.Exit(1)
 	}
-	clonedPath := vcs.Workspace().Path()
-	fmt.Println("[DEBUG] Cloned package to", clonedPath)
 
 	// Remove temporary directory in the end
 	cleanup := func(path string) {
