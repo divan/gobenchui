@@ -64,7 +64,7 @@ func (g *Git) Commits() ([]Commit, error) {
 			fmt.Fprintln(os.Stderr, "Wrong commit info, skipping: %s", str)
 			continue
 		}
-		timestamp, err := time.Parse(time.RFC1123Z, fields[1])
+		timestamp, err := time.Parse(RFC1123Z_git, fields[1])
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Cannot parse timestamp: %v", err)
 			continue
@@ -134,3 +134,6 @@ func cleanGitArgs(args ...string) []string {
 	}
 	return ret
 }
+
+// RFC1123Z_git is a git variation of RFC1123 time layout (--date=rfc)
+const RFC1123Z_git = "Mon, 2 Jan 2006 15:04:05 -0700"
