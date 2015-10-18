@@ -25,7 +25,7 @@ func init() {
 
 // StartServer starts http-server and servers frontend code
 // for benchmark results display.
-func StartServer(bind string, resCh chan BenchmarkSet, runCh chan BenchmarkRun, info *Info) error {
+func StartServer(bind string, ch chan interface{}, info *Info) error {
 	// Handle static files
 	var fs http.FileSystem
 	if DevMode() {
@@ -40,9 +40,20 @@ func StartServer(bind string, resCh chan BenchmarkSet, runCh chan BenchmarkRun, 
 		handler(w, r, info)
 	}))
 
+	// handle pool of websocket channels
+	pool := make(WSPool)
+	go func() {
+		for {
+			val := <-ch
+			for _, conn := range pool {
+				conn.ch <- val
+			}
+		}
+	}()
+
 	// Websocket handler
 	http.Handle("/ws", websocket.Handler(func(ws *websocket.Conn) {
-		wshandler(ws, resCh, runCh)
+		wshandler(ws, &pool)
 	}))
 
 	go StartBrowser("http://localhost" + bind)

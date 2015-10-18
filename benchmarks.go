@@ -23,15 +23,13 @@ type BenchmarkRun struct {
 }
 
 // RunBenchmarks loops over given commits and runs benchmarks for each of them.
-func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) (chan BenchmarkSet, chan BenchmarkRun) {
-	resultCh := make(chan BenchmarkSet)
-	runCh := make(chan BenchmarkRun)
+func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) chan interface{} {
+	ch := make(chan interface{})
 
 	go func(commits []Commit) {
-		defer close(resultCh)
-		defer close(runCh)
+		defer close(ch)
 
-		handleError := func(err error, run BenchmarkRun, ch chan BenchmarkRun) {
+		handleError := func(err error, run BenchmarkRun) {
 			fmt.Fprintf(os.Stderr, "[ERROR] %v\n", err)
 			run.Error = err
 			ch <- run
@@ -43,12 +41,12 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) (chan Benchmar
 				Commit:    commit,
 				StartTime: time.Now(),
 			}
-			runCh <- run
+			ch <- run
 
 			// Switch to previous commit
 			fmt.Printf("[DEBUG] Switching to %s\n", commit.Hash)
 			if err := vcs.SwitchTo(commit.Hash); err != nil {
-				handleError(err, run, runCh)
+				handleError(err, run)
 				return
 			}
 
@@ -56,23 +54,23 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) (chan Benchmar
 			// TODO: make it command agnostic (for gb and others)
 			out, err := Run(path, "go", "test", "-run", "XXXXXX", "-bench", benchRegexp)
 			if err != nil {
-				handleError(err, run, runCh)
+				handleError(err, run)
 				continue
 			}
 
 			set, err := ParseBenchmarkOutput(out)
 			if err != nil {
-				handleError(err, run, runCh)
+				handleError(err, run)
 				continue
 			}
 
 			set.Commit = commit
 
-			resultCh <- *set
+			ch <- *set
 		}
 	}(commits)
 
-	return resultCh, runCh
+	return ch
 }
 
 // ParseBenchmarkOutput parses raw output from 'go test -test.bench' command.

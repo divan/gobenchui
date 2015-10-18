@@ -66,7 +66,7 @@ func main() {
 		return
 	}
 
-	resultCh, runCh := RunBenchmarks(vcs, commits, *benchArgs)
+	ch := RunBenchmarks(vcs, commits, *benchArgs)
 
 	info := NewInfo(pkg, path, vcs.Name(), *benchArgs, commits)
 	info.SetStatus(InProgress)
@@ -76,24 +76,26 @@ func main() {
 	// stuck (websocket js issue or smth.), results will
 	// still be saved into info, so the page reload will
 	// show all results.
-	webCh := make(chan BenchmarkSet, 256)
+	webCh := make(chan interface{}, 1024)
 	go func() {
 		for {
 			select {
-			case result, ok := <-resultCh:
+			case val, ok := <-ch:
 				if !ok {
 					info.SetStatus(Finished)
 					return
 				}
-				info.AddResult(result)
-				info.SetStatus(InProgress)
+				if result, ok := val.(BenchmarkSet); ok {
+					info.AddResult(result)
+					info.SetStatus(InProgress)
+				}
 
-				webCh <- result
+				webCh <- val
 			}
 		}
 	}()
 
-	go StartServer(*bind, webCh, runCh, info)
+	go StartServer(*bind, webCh, info)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, os.Kill)
