@@ -32,7 +32,7 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) (chan Benchmar
 		defer close(runCh)
 
 		handleError := func(err error, run BenchmarkRun, ch chan BenchmarkRun) {
-			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintf(os.Stderr, "[ERROR] %v\n", err)
 			run.Error = err
 			ch <- run
 		}
@@ -57,13 +57,13 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) (chan Benchmar
 			out, err := Run(path, "go", "test", "-run", "XXXXXX", "-bench", benchRegexp)
 			if err != nil {
 				handleError(err, run, runCh)
-				return
+				continue
 			}
 
 			set, err := ParseBenchmarkOutput(out)
 			if err != nil {
 				handleError(err, run, runCh)
-				return
+				continue
 			}
 
 			set.Commit = commit

@@ -59,7 +59,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Couldn't delete temp dir:", err)
 		}
 	}
-	defer cleanup(vcs.Workspace.Root())
+	defer cleanup(vcs.Workspace().Root())
 
 	// Prepare commits to run benchmarks agains
 	commits, err := vcs.Commits()
