@@ -41,8 +41,9 @@ func wshandler(ws *websocket.Conn, resCh chan BenchmarkSet, runCh chan Benchmark
 				StartTime: status.StartTime,
 			}
 
-			// Ignore error, as we can't help much here
-			_ = sendJSON(ws, data)
+			if err := sendJSON(ws, data); err != nil {
+				return
+			}
 		case set, ok := <-resCh:
 			if !ok {
 				resCh = nil
@@ -56,8 +57,9 @@ func wshandler(ws *websocket.Conn, resCh chan BenchmarkSet, runCh chan Benchmark
 				Status: InProgress,
 			}
 
-			// Ignore error, as we can't help much here
-			_ = sendJSON(ws, data)
+			if err := sendJSON(ws, data); err != nil {
+				return
+			}
 		}
 	}
 }

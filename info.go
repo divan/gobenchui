@@ -19,20 +19,21 @@ const (
 type Info struct {
 	mx *sync.RWMutex
 
-	Status   Status
-	Progress float64
+	Status   Status  `json:"status"`
+	Progress float64 `json:"progress"`
 
-	PkgName string
-	PkgPath string
-	VCS     string
+	PkgName string `json:"pkg_name"`
+	PkgPath string `json:"pkg_path"`
+	VCS     string `json:"vcs"`
 
-	BenchOptions string
-	Commits      []Commit
+	BenchOptions string   `json:"bench_options"`
+	Commits      []Commit `json:"commits"`
 
-	BenchResults []BenchmarkSet
+	BenchResults []BenchmarkSet  `json:"results"`
+	Series       *HighchartsData `json:"series,omitempty"`
 
-	StartTime time.Time
-	EndTime   time.Time
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
 }
 
 // NewInfo returns new initialized info.
@@ -76,4 +77,8 @@ func (i *Info) AddResult(b BenchmarkSet) {
 	i.mx.Lock()
 	defer i.mx.Unlock()
 	i.BenchResults = append(i.BenchResults, b)
+	if i.Series == nil {
+		i.Series = &HighchartsData{}
+	}
+	i.Series.AddResult(b)
 }

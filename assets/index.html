@@ -41,7 +41,7 @@
 									};
 
 									var series = self.get(bench.Name);
-									console.log("Series", series);
+									console.log("series", bench.Name, series);
 									if (series) { // series already exists
 										series.addPoint(item, true, false);
 									} else { //  new series
@@ -94,6 +94,7 @@
 				crosshairs: true,
 				shared: true
 			},
+			{{ if .Series }} {{ .Series | json_stripped }} {{ end }}
 		};
 
         window.onload = function() {
@@ -115,6 +116,5 @@
 		<h5>Current commit: <span id="commit"></span></h5>
 	</div>
 	<div id="container"></div>
-
 </body>
 </html>

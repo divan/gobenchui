@@ -2,6 +2,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/elazarl/go-bindata-assetfs"
 	"html/template"
@@ -87,6 +89,18 @@ var funcs = template.FuncMap{
 		default:
 			return nil
 		}
+	},
+	"json_stripped": func(a interface{}) template.JS {
+		data, err := json.Marshal(a)
+		if err != nil {
+			fmt.Printf("[ERROR] failed to encode series: %v\n", err)
+			return ""
+		}
+		data = bytes.TrimPrefix(data, []byte("{"))
+		data = bytes.TrimSuffix(data, []byte("}"))
+
+		js := template.JS(string(data))
+		return js
 	},
 }
 
