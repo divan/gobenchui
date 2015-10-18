@@ -78,6 +78,11 @@ func (g *Git) Commits() ([]Commit, error) {
 		commits = append(commits, commit)
 	}
 
+	// Filter to max entries, if specified
+	if g.filter.Max > 0 {
+		commits = FilterMax(commits, g.filter.Max)
+	}
+
 	return commits, nil
 }
 
