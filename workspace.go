@@ -9,26 +9,39 @@ import (
 	"strings"
 )
 
-// Workspace represents local VCS workspace.
+// Workspace represents local top-level VCS workspace.
+//
+// Package may be in subfolder (like github.com/etcd/coreos/store),
+// but Workspace represents the whole directory (github.com/etcd/coreos).
+//
+// Following this example, root is '~/github.com/etcd/coreos',
+// prefix is 'store'.
 type Workspace struct {
-	path string
+	root   string
+	prefix string
 }
 
 // NewWorkspace creates new Workspace.
-func NewWorkspace(path string) *Workspace {
+func NewWorkspace(root, prefix string) *Workspace {
 	return &Workspace{
-		path: path,
+		root:   root,
+		prefix: prefix,
 	}
 }
 
-// Path returns local workspace path.
+// Path returns full workspace path to package (w/ prefix).
 func (w *Workspace) Path() string {
-	return w.path
+	return filepath.Join(w.root, w.prefix)
 }
 
-// SetPath sets new path for workspace.
+// Root returns root directory for workspace (w/o prefix).
+func (w *Workspace) Root() string {
+	return w.root
+}
+
+// SetPath sets new root path for workspace.
 func (w *Workspace) SetPath(path string) {
-	w.path = path
+	w.root = path
 }
 
 // Clone copies whole workspace to temporary directory.
@@ -38,7 +51,7 @@ func (w *Workspace) Clone() error {
 		return err
 	}
 
-	err = copyAll(tmp+"/", w.Path())
+	err = copyAll(tmp+"/", w.Root())
 	if err != nil {
 		return err
 	}

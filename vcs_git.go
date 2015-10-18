@@ -1,9 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -17,20 +17,36 @@ type Git struct {
 
 // NewGitVCS returns new Git vcs, and checks it it's valid git workspace.
 func NewGitVCS(path string, filter FilterOptions) (*Git, error) {
-	// check if given path contains .git/ directory
-	// TODO: add more sophisiticated workspace check
-	gitpath := filepath.Join(path, ".git")
-	_, err := os.Stat(gitpath)
+	// check if this path is under git control
+	_, err := Run(path, "git", "rev-parse", "--git-dir")
 	if err != nil {
 		return nil, err
 	}
 
-	workspace := NewWorkspace(path)
+	// find top-level (root) directory of workspace
+	out, err := Run(path, "git", "rev-parse", "--show-toplevel")
+	if err != nil {
+		return nil, errors.New("cannot determine root folder")
+	}
+	root := strings.TrimSpace(out)
+	prefix := findPrefix(path, root)
+
+	workspace := NewWorkspace(root, prefix)
 	vcs := &Git{
 		workspace: workspace,
 		filter:    filter,
 	}
 	return vcs, nil
+}
+
+// findPrefix find relative dir in top-level dir.
+// It's basically the same as `git rev-parse --show-prefix`.
+//
+// If package is in top-level directory, prefix is "".
+func findPrefix(path, root string) string {
+	prefix := strings.TrimPrefix(path, root)
+	prefix = strings.TrimPrefix(prefix, "/")
+	return prefix
 }
 
 // Commits returns all commits for the current branch. Implements VCS interface.

@@ -35,9 +35,9 @@ func main() {
 	}
 	fmt.Println("Benchmarking package", path)
 
-	// only git so far
 	var vcs VCS
 	filter := NewFilterOptions(*lastN, *max, *vcsArgs)
+	// only git so far
 	vcs, err = NewGitVCS(path, *filter)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "package isn't under any supported VCS, so no benchmarks to compare\n")
@@ -59,7 +59,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Couldn't delete temp dir:", err)
 		}
 	}
-	defer cleanup(clonedPath)
+	defer cleanup(vcs.Workspace.Root())
 
 	// Prepare commits to run benchmarks agains
 	commits, err := vcs.Commits()
