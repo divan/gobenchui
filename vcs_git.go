@@ -61,12 +61,12 @@ func (g *Git) Commits() ([]Commit, error) {
 	for _, str := range lines {
 		fields := strings.SplitN(str, "|", 4)
 		if len(fields) != 4 {
-			fmt.Fprintln(os.Stderr, "Wrong commit info, skipping: %s", str)
+			fmt.Fprintln(os.Stderr, "[ERROR] Wrong commit info, skipping: %s", str)
 			continue
 		}
 		timestamp, err := time.Parse(RFC1123Z_git, fields[1])
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Cannot parse timestamp: %v", err)
+			fmt.Fprintln(os.Stderr, "[ERROR] Cannot parse timestamp: %v", err)
 			continue
 		}
 		commit := Commit{
