@@ -23,7 +23,7 @@ type BenchmarkRun struct {
 }
 
 // RunBenchmarks loops over given commits and runs benchmarks for each of them.
-func RunBenchmarks(vcs VCS, commits []Commit) (chan BenchmarkSet, chan BenchmarkRun) {
+func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) (chan BenchmarkSet, chan BenchmarkRun) {
 	resultCh := make(chan BenchmarkSet)
 	runCh := make(chan BenchmarkRun)
 
@@ -54,7 +54,7 @@ func RunBenchmarks(vcs VCS, commits []Commit) (chan BenchmarkSet, chan Benchmark
 
 			// Run benchmark for this commit
 			// TODO: make it command agnostic (for gb and others)
-			out, err := Run(path, "go", "test", "-run", "XXXXXX", "-bench", ".")
+			out, err := Run(path, "go", "test", "-run", "XXXXXX", "-bench", benchRegexp)
 			if err != nil {
 				handleError(err, run, runCh)
 				return

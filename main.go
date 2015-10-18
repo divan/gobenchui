@@ -15,7 +15,7 @@ var (
 
 	bind      = flag.String("bind", ":6222", "host:port to bind http server to")
 	vcsArgs   = flag.String("vcsArgs", "", "Additional args for vcs command (git, hg, etc)")
-	benchArgs = flag.String("benchArgs", "", "Custom 'go test' flags")
+	benchArgs = flag.String("bench", ".", "Regexp for benchmarks, as for `go test -bench`")
 	lastN     = flag.Int64("n", 0, "Last N commits only")
 	max       = flag.Int64("max", 0, "Maximum commits (distribute evenly)")
 )
@@ -68,7 +68,7 @@ func main() {
 		return
 	}
 
-	resultCh, runCh := RunBenchmarks(vcs, commits)
+	resultCh, runCh := RunBenchmarks(vcs, commits, *benchArgs)
 
 	info := NewInfo(pkg, path, vcs.Name(), *benchArgs, commits)
 	info.SetStatus(InProgress)
