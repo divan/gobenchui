@@ -38,7 +38,7 @@ func (g *Git) Commits() ([]Commit, error) {
 	path := g.Workspace().Path()
 
 	// Prepare args, and add user defined args to `git log` command
-	args := []string{"log", `--pretty=format:%H|%cd|%s|%cn <%ce>`, `--date=rfc`}
+	args := []string{"log", `--pretty=format:%H|%cd|%cn <%ce>|%s`, `--date=rfc`}
 	if len(g.filter.Args) > 0 {
 		// Append custom arguments, excluding formatting-related ones
 		cleanedArgs := cleanGitArgs(g.filter.Args...)
@@ -59,7 +59,7 @@ func (g *Git) Commits() ([]Commit, error) {
 
 	var commits []Commit
 	for _, str := range lines {
-		fields := strings.Split(str, "|")
+		fields := strings.SplitN(str, "|", 4)
 		if len(fields) != 4 {
 			fmt.Fprintln(os.Stderr, "Wrong commit info, skipping: %s", str)
 			continue
@@ -72,8 +72,8 @@ func (g *Git) Commits() ([]Commit, error) {
 		commit := Commit{
 			Hash:    fields[0],
 			Date:    timestamp,
-			Subject: fields[2],
-			Author:  fields[3],
+			Subject: fields[3],
+			Author:  fields[2],
 		}
 		commits = append(commits, commit)
 	}
