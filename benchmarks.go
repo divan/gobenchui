@@ -51,8 +51,22 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) chan interface
 			}
 
 			// Run benchmark for this commit
-			gotool := GoTool{}
-			out, err := gotool.Benchmark(vcs.Workspace(), benchRegexp)
+			// but first, try to guess what vendoring is used (if any)
+			// and use appropriate tool
+			runBenchmark := func(b Benchmarker) (string, error, bool) {
+				if !b.Check(vcs.Workspace()) {
+					return "", nil, false
+				}
+				fmt.Println("[DEBUG] Using", b.Name())
+				out, err := b.Benchmark(vcs.Workspace(), benchRegexp)
+				return out, err, true
+			}
+			// Try normal go tool
+			out, err, ok := runBenchmark(GoTool{})
+			if !ok {
+				// Try GB
+				out, err, _ = runBenchmark(GbTool{})
+			}
 			if err != nil {
 				handleError(err, run)
 				continue
