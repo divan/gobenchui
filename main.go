@@ -67,7 +67,7 @@ func main() {
 
 	ch := RunBenchmarks(vcs, commits, *benchArgs)
 
-	info := NewInfo(pkg, path, vcs.Name(), *benchArgs, commits)
+	info := NewInfo(pkg, path, vcs.Name(), *benchArgs, filter, commits)
 	info.SetStatus(InProgress)
 
 	// There is basically no reason to make this channel

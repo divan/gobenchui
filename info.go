@@ -33,6 +33,7 @@ type Info struct {
 	VCS     string `json:"vcs"`
 
 	BenchOptions string   `json:"bench_options"`
+	Filter       string   `json:"filter"`
 	Commits      []Commit `json:"commits"`
 
 	BenchResults []BenchmarkSet  `json:"results"`
@@ -44,7 +45,7 @@ type Info struct {
 }
 
 // NewInfo returns new initialized info.
-func NewInfo(pkg, path, vcs, benchopts string, commits []Commit) *Info {
+func NewInfo(pkg, path, vcs, benchopts string, filter *FilterOptions, commits []Commit) *Info {
 	return &Info{
 		mx: &sync.RWMutex{},
 
@@ -58,6 +59,7 @@ func NewInfo(pkg, path, vcs, benchopts string, commits []Commit) *Info {
 		VCS:     vcs,
 
 		BenchOptions: benchopts,
+		Filter:       filter.String(),
 		Commits:      commits,
 
 		StartTime: time.Now(),

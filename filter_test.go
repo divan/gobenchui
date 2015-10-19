@@ -77,4 +77,22 @@ func TestFilterMax(t *testing.T) {
 			So(res[74].Hash, ShouldEqual, "Hash 99")
 		})
 	})
+	Convey("Filter string() should generate text correctly", t, func() {
+		Convey("When nothing specified", func() {
+			str := NewFilterOptions(0, 0).String()
+			So(str, ShouldEqual, "all commits")
+		})
+		Convey("When lastN and Max specified", func() {
+			str := NewFilterOptions(99, 20).String()
+			So(str, ShouldEqual, "max 20 from last 99 commits")
+		})
+		Convey("When lastN specified", func() {
+			str := NewFilterOptions(150, 0).String()
+			So(str, ShouldEqual, "last 150 commits")
+		})
+		Convey("When Max specified", func() {
+			str := NewFilterOptions(0, 25).String()
+			So(str, ShouldEqual, "max 25 from all commits")
+		})
+	})
 }

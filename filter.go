@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 // FilterOptions represents advanced filtering for vcs commits.
 type FilterOptions struct {
 	// LastN is for 'last N commits'
@@ -60,4 +64,19 @@ func FilterMax(commits []Commit, max int64) []Commit {
 		i = i + size
 	}
 	return ret
+}
+
+// String implements Stringer for FilterOptions.
+func (f *FilterOptions) String() string {
+	out := ""
+	if f.Max > 0 {
+		out = fmt.Sprintf("%smax %d from ", out, f.Max)
+	}
+	if f.LastN > 0 {
+		out = fmt.Sprintf("%slast %d ", out, f.LastN)
+	} else {
+		out = fmt.Sprintf("%sall ", out)
+	}
+	out = fmt.Sprintf("%scommits", out)
+	return out
 }

@@ -57,6 +57,7 @@
 		<div class="one-third column" style="text-align: left">
 			<h2>{{ .PkgName }}</h2>
 			<h3>Path: {{ .PkgPath }}</h3>
+			<h5>Bench: {{ .BenchOptions }}</h5>
 		</div>
 		<div class="one-third column" style="text-align: center">
 			<h2>Status: <span id="status">{{ .Status }}</span>&nbsp;<img id="status_image" src="/static/loader.gif"></h2>
@@ -67,6 +68,7 @@
 		<div class="one-third column" style="text-align: right">
 			<h2>{{ len .Commits }} commits</h2>
 			<h3>{{ with last .Commits}}{{ .Date.Format "2006-01-02" }}{{ end }} - {{ with index .Commits 1 }}{{ .Date.Format "2006-01-02" }}{{ end }}</h3>
+			<h5>Filter: {{ .Filter }}</h5>
 		</div>
 	</div>
 	<div class="row">
