@@ -103,6 +103,10 @@ My frontend JS code sucks, because I'm not frontend developer, so if you want to
 
 Make sure to run `go generate` to regenerate assets. Or use GOBENCHUI_DEV env variable to read assets from filesystem.
 
+## Afterwords
+
+Hopefully, this tool will bring more incentive to write benchmarks.
+
 ## License
 
 This program is under [WTFPL license](http://www.wtfpl.net)
