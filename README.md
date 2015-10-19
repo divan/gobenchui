@@ -18,6 +18,7 @@ GoBenchUI does one simple thing - it copies your package into temporary director
 * supports projects that use [gb](http://getgb.io) or GO15VENDOREXPERIMENT vendoring
 * advanced commits filtering
 * supports regexps for benchmarks
+* handles build errors and panics
 
 ## Installation
 
