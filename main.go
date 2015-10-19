@@ -34,15 +34,18 @@ func main() {
 		os.Exit(1)
 	}
 	pkg = normalizePkgName(pkg, path, gopath)
-	fmt.Println("Benchmarking package", pkg)
+	fmt.Println("[INFO] Benchmarking package", pkg)
 
 	var vcs VCS
 	filter := NewFilterOptions(*lastN, *max, *vcsArgs)
-	// only git so far
+
 	vcs, err = NewGitVCS(path, *filter)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "package isn't under any supported VCS, so no benchmarks to compare\n")
-		os.Exit(1)
+		vcs, err = NewHgVCS(path, *filter)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "package isn't under any supported VCS, so no benchmarks to compare\n")
+			os.Exit(1)
+		}
 	}
 
 	err = vcs.Workspace().Clone()

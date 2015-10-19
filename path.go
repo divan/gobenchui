@@ -36,3 +36,13 @@ func normalizePkgName(pkg, absPath, gopath string) string {
 	// outside of GOPATH scope, so just use it's basename
 	return filepath.Base(absPath)
 }
+
+// findPrefix find relative dir in top-level dir.
+// It's basically the same as `git rev-parse --show-prefix`.
+//
+// If package is in top-level directory, prefix is "".
+func findPrefix(path, root string) string {
+	prefix := strings.TrimPrefix(path, root)
+	prefix = strings.TrimPrefix(prefix, "/")
+	return prefix
+}

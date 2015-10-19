@@ -8,23 +8,23 @@ import (
 	"time"
 )
 
-// Git implements VCS for Git version control.
-type Git struct {
+// Hg implements VCS for Mercurial version control.
+type Hg struct {
 	workspace *Workspace
 
 	filter FilterOptions
 }
 
-// NewGitVCS returns new Git vcs, and checks it it's valid git workspace.
-func NewGitVCS(path string, filter FilterOptions) (*Git, error) {
-	// check if this path is under git control
-	_, err := Run(path, "git", "rev-parse", "--git-dir")
+// NewHgVCS returns new Mercurial vcs, and checks it it's valid hg workspace.
+func NewHgVCS(path string, filter FilterOptions) (*Hg, error) {
+	// check if this path is under hg control
+	_, err := Run(path, "hg", "verify")
 	if err != nil {
 		return nil, err
 	}
 
 	// find top-level (root) directory of workspace
-	out, err := Run(path, "git", "rev-parse", "--show-toplevel")
+	out, err := Run(path, "hg", "root")
 	if err != nil {
 		return nil, errors.New("cannot determine root folder")
 	}
@@ -32,7 +32,7 @@ func NewGitVCS(path string, filter FilterOptions) (*Git, error) {
 	prefix := findPrefix(path, root)
 
 	workspace := NewWorkspace(root, prefix)
-	vcs := &Git{
+	vcs := &Hg{
 		workspace: workspace,
 		filter:    filter,
 	}
@@ -40,37 +40,49 @@ func NewGitVCS(path string, filter FilterOptions) (*Git, error) {
 }
 
 // Commits returns all commits for the current branch. Implements VCS interface.
-func (g *Git) Commits() ([]Commit, error) {
+func (g *Hg) Commits() ([]Commit, error) {
 	path := g.Workspace().Path()
 
-	// Prepare args, and add user defined args to `git log` command
-	args := []string{"log", `--pretty=format:%H|%cd|%cn <%ce>|%s`, `--date=rfc`}
+	// Prepare args, and add user defined args to `hg log` command
+	args := []string{"log", `--template={node}%{date|rfc822date}%{author}%{desc}\n`}
 	if len(g.filter.Args) > 0 {
 		// Append custom arguments, excluding formatting-related ones
-		cleanedArgs := cleanGitArgs(g.filter.Args...)
+		cleanedArgs := cleanHgArgs(g.filter.Args...)
 		args = append(args, cleanedArgs...)
 	}
 
 	if g.filter.LastN > 0 {
-		lastNArg := fmt.Sprintf("-n %d", g.filter.LastN)
+		lastNArg := fmt.Sprintf("-l %d", g.filter.LastN)
 		args = append(args, lastNArg)
 	}
 
-	out, err := Run(path, "git", args...)
+	out, err := Run(path, "hg", args...)
 	if err != nil {
 		return nil, err
 	}
 
 	lines := strings.Split(out, "\n")
 
+	commits := parseHgCommits(lines)
+
+	// Filter to max entries, if specified
+	if g.filter.Max > 0 {
+		commits = FilterMax(commits, g.filter.Max)
+	}
+
+	return commits, nil
+}
+
+// parseHgCommits parses output from `hg log` command.
+func parseHgCommits(lines []string) []Commit {
 	var commits []Commit
 	for _, str := range lines {
-		fields := strings.SplitN(str, "|", 4)
+		fields := strings.SplitN(str, "%", 4)
 		if len(fields) != 4 {
 			fmt.Fprintln(os.Stderr, "[ERROR] Wrong commit info, skipping: %s", str)
 			continue
 		}
-		timestamp, err := time.Parse(RFC1123Z_git, fields[1])
+		timestamp, err := time.Parse(time.RFC1123Z, fields[1])
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "[ERROR] Cannot parse timestamp: %v", err)
 			continue
@@ -84,43 +96,39 @@ func (g *Git) Commits() ([]Commit, error) {
 		commits = append(commits, commit)
 	}
 
-	// Filter to max entries, if specified
-	if g.filter.Max > 0 {
-		commits = FilterMax(commits, g.filter.Max)
-	}
-
-	return commits, nil
+	return commits
 }
 
 // SwitchTo switches to the given commit by hash. Implements VCS interface.
-func (g *Git) SwitchTo(hash string) error {
+func (g *Hg) SwitchTo(hash string) error {
 	path := g.Workspace().Path()
-	_, err := Run(path, "git", "checkout", hash)
+	_, err := Run(path, "hg", "update", hash)
 	return err
 }
 
 // Workspace returns assosiated Workspace. Implements VCS interface.
-func (g *Git) Workspace() *Workspace {
+func (g *Hg) Workspace() *Workspace {
 	return g.workspace
 }
 
 // Name returns vcs common name. Implements VCS interface.
-func (*Git) Name() string {
-	return "git"
+func (*Hg) Name() string {
+	return "hg"
 }
 
 var (
-	ignoredGitArgs = []string{
-		"--date-order", "--author-date-order", "--topo-order", "--reverse",
-		"--relative-date", "--date", "--parents", "--children", "--left-right",
-		"--graph", "--show-linear-break", "--pretty",
+	// TODO: find a person who use mercurial a lot and can
+	// help to add more ignored args (ones that may affect
+	// predetermined output)
+	ignoredHgArgs = []string{
+		"--template",
 	}
 )
 
-// cleanGitArgs cleans user defined custom git arguments.
+// cleanHgArgs cleans user defined custom hg arguments.
 // it basically removes arguments, that may affect formatting
 // output (we use specific format for parsing results)
-func cleanGitArgs(args ...string) []string {
+func cleanHgArgs(args ...string) []string {
 	var ret []string
 	for _, arg := range args {
 		trimmed := strings.TrimSpace(arg)
@@ -129,7 +137,7 @@ func cleanGitArgs(args ...string) []string {
 		}
 
 		var ignore bool
-		for _, ignored := range ignoredGitArgs {
+		for _, ignored := range ignoredHgArgs {
 			if strings.HasPrefix(trimmed, ignored) {
 				ignore = true
 			}
@@ -140,6 +148,3 @@ func cleanGitArgs(args ...string) []string {
 	}
 	return ret
 }
-
-// RFC1123Z_git is a git variation of RFC1123 time layout (--date=rfc)
-const RFC1123Z_git = "Mon, 2 Jan 2006 15:04:05 -0700"
