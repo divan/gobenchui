@@ -81,7 +81,7 @@ func parseGitCommits(lines []string, location *time.Location) []Commit {
 			fmt.Fprintln(os.Stderr, "[ERROR] Wrong commit info, skipping:", len(fields), str)
 			continue
 		}
-		timestamp, err := time.ParseInLocation(RFC1123Z_git, fields[1], location)
+		timestamp, err := time.ParseInLocation(RFC1123ZGit, fields[1], location)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "[ERROR] Cannot parse timestamp:", err)
 			continue
@@ -147,5 +147,5 @@ func cleanGitArgs(args ...string) []string {
 	return ret
 }
 
-// RFC1123Z_git is a git variation of RFC1123 time layout (--date=rfc)
-const RFC1123Z_git = "Mon, 2 Jan 2006 15:04:05 -0700"
+// RFC1123ZGit is a git variation of RFC1123 time layout (--date=rfc)
+const RFC1123ZGit = "Mon, 2 Jan 2006 15:04:05 -0700"

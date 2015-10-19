@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Status represents a benchmark status.
 type Status string
 
 const (
@@ -91,7 +92,7 @@ func (i *Info) SetStatus(status Status) {
 	}
 }
 
-// AddResults inserts new BenchmarkSet result to Info.
+// AddResult inserts new BenchmarkSet result to Info.
 func (i *Info) AddResult(b BenchmarkSet) {
 	i.mx.Lock()
 	defer i.mx.Unlock()

@@ -36,7 +36,7 @@ func Run(dir, command string, args ...string) (string, error) {
 func (r *RunError) Error() string {
 	if r.Stderr != "" {
 		return fmt.Sprintf("failed: %s", r.Stderr)
-	} else {
-		return fmt.Sprintf("failed: %s", r.Message)
 	}
+
+	return fmt.Sprintf("failed: %s", r.Message)
 }
