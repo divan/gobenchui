@@ -44,7 +44,7 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) chan interface
 			ch <- run
 
 			// Switch to previous commit
-			fmt.Printf("[DEBUG] Switching to %s\n", commit.Hash)
+			fmt.Printf("[DEBUG] Switching to %s (%s) by %s\n", commit.Hash, commit.Subject, commit.Author)
 			if err := vcs.SwitchTo(commit.Hash); err != nil {
 				handleError(err, run)
 				return

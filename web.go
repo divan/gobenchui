@@ -87,6 +87,7 @@ func StartBrowser(url string) bool {
 		args = []string{"xdg-open"}
 	}
 	cmd := exec.Command(args[0], append(args[1:], url)...)
+	fmt.Println("If browser window didn't appear, please go to this url:", url)
 	return cmd.Start() == nil
 }
 

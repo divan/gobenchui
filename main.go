@@ -15,7 +15,7 @@ var (
 	bind      = flag.String("bind", ":6222", "host:port to bind http server to")
 	vcsArgs   = flag.String("vcsArgs", "", "Additional args for vcs command (git, hg, etc)")
 	benchArgs = flag.String("bench", ".", "Regexp for benchmarks, as for `go test -bench`")
-	lastN     = flag.Int64("n", 0, "Last N commits only")
+	lastN     = flag.Int64("last", 0, "Last N commits only")
 	max       = flag.Int64("max", 0, "Maximum commits (distribute evenly)")
 )
 
