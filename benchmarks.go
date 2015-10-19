@@ -36,7 +36,6 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) chan interface
 			ch <- run
 		}
 
-		path := vcs.Workspace().Path()
 		for _, commit := range commits {
 			run := BenchmarkRun{
 				Commit:    commit,
@@ -52,8 +51,8 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) chan interface
 			}
 
 			// Run benchmark for this commit
-			// TODO: make it command agnostic (for gb and others)
-			out, err := Run(path, "go", "test", "-run", "XXXXXX", "-bench", benchRegexp, "-benchmem")
+			gotool := GoTool{}
+			out, err := gotool.Benchmark(vcs.Workspace(), benchRegexp)
 			if err != nil {
 				handleError(err, run)
 				continue

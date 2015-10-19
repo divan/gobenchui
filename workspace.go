@@ -16,9 +16,15 @@ import (
 //
 // Following this example, root is '~/github.com/etcd/coreos',
 // prefix is 'store'.
+//
+// gopath is introduced to handle GO15VENDOREXPERIMENT gopath issue,
+// if root is '/tmp/tempXXXX/src/pkg/github.com/etcd/coreos',
+// then gopath is '/tmp/tempXXXX'. Optional.
 type Workspace struct {
 	root   string
 	prefix string
+
+	gopath string
 }
 
 // NewWorkspace creates new Workspace.
@@ -39,9 +45,15 @@ func (w *Workspace) Root() string {
 	return w.root
 }
 
-// SetPath sets new root path for workspace.
-func (w *Workspace) SetPath(path string) {
-	w.root = path
+// Gopath returns root gopath directory for workspace (w/o prefix).
+func (w *Workspace) Gopath() string {
+	return w.gopath
+}
+
+// SetRoot sets new root path for workspace.
+func (w *Workspace) SetRoot(gopath, root string) {
+	w.gopath = gopath
+	w.root = root
 }
 
 // Clone copies whole workspace to temporary directory.
@@ -52,12 +64,20 @@ func (w *Workspace) Clone() error {
 	}
 
 	fmt.Println("[DEBUG] Cloning git workspace to", tmp)
-	err = copyAll(tmp+"/", w.Root())
+	// place sources under src/pkg to make it look like
+	// proper GOPATH (needed for GO15VENDOREXPERIMENT support)
+	targetDir := filepath.Join(tmp, "src", "pkg")
+	err = os.MkdirAll(targetDir, os.ModePerm)
 	if err != nil {
 		os.RemoveAll(tmp)
 		return err
 	}
-	w.SetPath(tmp)
+	err = copyAll(targetDir+"/", w.Root())
+	if err != nil {
+		os.RemoveAll(tmp)
+		return err
+	}
+	w.SetRoot(tmp, targetDir)
 
 	return nil
 }

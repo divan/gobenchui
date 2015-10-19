@@ -56,7 +56,7 @@ func main() {
 
 	// Remove temporary directory in the end
 	cleanup := func() {
-		path := vcs.Workspace().Root()
+		path := vcs.Workspace().Gopath()
 		os.RemoveAll(path)
 	}
 	defer cleanup()
@@ -90,8 +90,6 @@ func main() {
 						Status:   Finished,
 						Progress: 100.0,
 					}
-					fmt.Println("[INFO] Finished, cleaning up.")
-					cleanup()
 					return
 				}
 				if result, ok := val.(BenchmarkSet); ok {
