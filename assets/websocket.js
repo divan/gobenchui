@@ -11,6 +11,13 @@ sock.onmessage = function(e) {
 	if (msg.type === 'status') {
 		date = moment(msg.commit.date).format('YYYY-MM-DD HH:mm:ss');
 		document.getElementById('status').innerHTML = msg.status;
+
+		// hide loader if not 'in progress'
+		if (msg.status !== 'In progress') {
+			document.getElementById('status_image').style.visibility = "hidden";
+		};
+
+		// add markers on error
 		if (msg.error !== undefined) {
 			// TODO: these icons somehow doesn't work with exported highcharts.js png/jpg
 			// find out why (already spent 2 hours) and replace with working ones.

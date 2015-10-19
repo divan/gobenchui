@@ -59,7 +59,7 @@
 			<h3>Path: {{ .PkgPath }}</h3>
 		</div>
 		<div class="one-third column" style="text-align: center">
-			<h2>Status: <span id="status">{{ .Status }}</span></h2>
+			<h2>Status: <span id="status">{{ .Status }}</span>&nbsp;<img id="status_image" src="/static/loader.gif"></h2>
 			{{ if .CurrentCommit }}
 			<h5 id="commit_block">Current commit: <span id="commit">{{ .CurrentCommit.Date.Format "2006-01-02 15:04:05" }} ({{ .CurrentCommit.Subject }})<br />Hash: {{ .CurrentCommit.Hash }}</span></h5>
 			{{ end }}
@@ -74,7 +74,6 @@
 		<div class="bordered" id="mem_benchmark"></div>
 	</div>
 	<div class="footer">
-		<hr />
 		<p>generated with <a href="http://github.com/divan/gobenchui" target="_blank">gobenchui</a> by <a href="http://github.com/divan" target="_blank">divan</a></p>
 	</div>
 	</div>
