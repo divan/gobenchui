@@ -12,7 +12,7 @@
 
 		function xvalue(commit) {
 			date = moment(commit.date).format('YY-MM-DD');
-			return date + '<br/>' + commit.hash.substring(0,6);
+			return date + '/' + commit.hash.substring(0,6);
 		}
 
 		var options_time = {

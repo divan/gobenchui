@@ -42,7 +42,7 @@ func xvalue(commit Commit) string {
 	if len(commit.Hash) > 6 {
 		hash = commit.Hash[0:6]
 	}
-	return fmt.Sprintf("%s %s", date, hash)
+	return fmt.Sprintf("%s/%s", date, hash)
 }
 
 // AddResult adds and converts benchmark set into
