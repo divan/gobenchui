@@ -113,7 +113,7 @@ func (d *HighchartsData) AddResult(b BenchmarkSet, typ string) {
 	// for this commit if no benchmarks were conducted.
 	for _, serie := range d.Series {
 		var found bool
-		for name, _ := range b.Set {
+		for name := range b.Set {
 			if name == serie.Name {
 				found = true
 				break

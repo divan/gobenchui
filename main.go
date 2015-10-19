@@ -43,7 +43,7 @@ func main() {
 	if err != nil {
 		vcs, err = NewHgVCS(path, *filter)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "package isn't under any supported VCS, so no benchmarks to compare\n")
+			fmt.Fprintln(os.Stderr, "package isn't under any supported VCS, so no benchmarks to compare")
 			os.Exit(1)
 		}
 	}

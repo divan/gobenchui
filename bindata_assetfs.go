@@ -90,7 +90,7 @@ func assetsIndexHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/index.html", size: 4371, mode: os.FileMode(420), modTime: time.Unix(1445276122, 0)}
+	info := bindataFileInfo{name: "assets/index.html", size: 4371, mode: os.FileMode(420), modTime: time.Unix(1445292578, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -110,7 +110,7 @@ func assetsLoaderGif() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/loader.gif", size: 5446, mode: os.FileMode(420), modTime: time.Unix(1445228930, 0)}
+	info := bindataFileInfo{name: "assets/loader.gif", size: 5446, mode: os.FileMode(420), modTime: time.Unix(1445292578, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -130,7 +130,7 @@ func assetsMainCss() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/main.css", size: 1082, mode: os.FileMode(420), modTime: time.Unix(1445229826, 0)}
+	info := bindataFileInfo{name: "assets/main.css", size: 1082, mode: os.FileMode(420), modTime: time.Unix(1445292578, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -150,7 +150,7 @@ func assetsPanicPng() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/panic.png", size: 1281, mode: os.FileMode(420), modTime: time.Unix(1445223023, 0)}
+	info := bindataFileInfo{name: "assets/panic.png", size: 1281, mode: os.FileMode(420), modTime: time.Unix(1445292578, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -170,7 +170,7 @@ func assetsSkeletonCss() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/skeleton.css", size: 11452, mode: os.FileMode(420), modTime: time.Unix(1445220472, 0)}
+	info := bindataFileInfo{name: "assets/skeleton.css", size: 11452, mode: os.FileMode(420), modTime: time.Unix(1445292578, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -190,7 +190,7 @@ func assetsWarningPng() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/warning.png", size: 1397, mode: os.FileMode(420), modTime: time.Unix(1265874921, 0)}
+	info := bindataFileInfo{name: "assets/warning.png", size: 1397, mode: os.FileMode(420), modTime: time.Unix(1445292578, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -210,7 +210,7 @@ func assetsWebsocketJs() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/websocket.js", size: 3262, mode: os.FileMode(420), modTime: time.Unix(1445246494, 0)}
+	info := bindataFileInfo{name: "assets/websocket.js", size: 3262, mode: os.FileMode(420), modTime: time.Unix(1445292578, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
