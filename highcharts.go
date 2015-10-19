@@ -24,7 +24,9 @@ type Point struct {
 
 // AddResult adds and converts benchmark set into
 // highcharts-compatible representation of series/points.
-func (d *HighchartsData) AddResult(b BenchmarkSet) {
+//
+// typ defines which result goes to this serie: "time" or "memory"
+func (d *HighchartsData) AddResult(b BenchmarkSet, typ string) {
 	// we currently use commit date as a point
 	// X value, stick for it for a while
 	pointName := b.Commit.Date.Format("2006-01-02 15:04:05")
@@ -50,7 +52,14 @@ func (d *HighchartsData) AddResult(b BenchmarkSet) {
 
 		point := &Point{
 			Name:  pointName,
-			Value: &(bench[0].NsPerOp),
+			Value: nil,
+		}
+		switch typ {
+		case "time":
+			point.Value = &(bench[0].NsPerOp)
+		case "memory":
+			val := float64(bench[0].AllocedBytesPerOp)
+			point.Value = &val
 		}
 		serie.Data = append(serie.Data, point)
 	}

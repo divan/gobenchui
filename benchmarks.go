@@ -52,7 +52,7 @@ func RunBenchmarks(vcs VCS, commits []Commit, benchRegexp string) chan interface
 
 			// Run benchmark for this commit
 			// TODO: make it command agnostic (for gb and others)
-			out, err := Run(path, "go", "test", "-run", "XXXXXX", "-bench", benchRegexp)
+			out, err := Run(path, "go", "test", "-run", "XXXXXX", "-bench", benchRegexp, "-benchmem")
 			if err != nil {
 				handleError(err, run)
 				continue

@@ -36,3 +36,14 @@ h5 {
 	line-height: 14px;
 	margin: 0 0 14px;
 }
+
+.container {
+	width: 100%;
+}
+
+.half {
+	float: left;
+	width: 49%;
+	max-width: 49%;
+	border: 1px lightgrey solid;
+}

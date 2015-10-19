@@ -36,7 +36,8 @@ type Info struct {
 	Commits      []Commit `json:"commits"`
 
 	BenchResults []BenchmarkSet  `json:"results"`
-	Series       *HighchartsData `json:"series,omitempty"`
+	TimeSeries   *HighchartsData `json:"time_series,omitempty"`
+	MemSeries    *HighchartsData `json:"mem_series,omitempty"`
 
 	StartTime time.Time `json:"start_time"`
 	EndTime   time.Time `json:"end_time"`
@@ -92,8 +93,13 @@ func (i *Info) AddResult(b BenchmarkSet) {
 	i.mx.Lock()
 	defer i.mx.Unlock()
 	i.BenchResults = append(i.BenchResults, b)
-	if i.Series == nil {
-		i.Series = &HighchartsData{}
+	if i.TimeSeries == nil {
+		i.TimeSeries = &HighchartsData{}
 	}
-	i.Series.AddResult(b)
+	i.TimeSeries.AddResult(b, "time")
+
+	if i.MemSeries == nil {
+		i.MemSeries = &HighchartsData{}
+	}
+	i.MemSeries.AddResult(b, "memory")
 }
