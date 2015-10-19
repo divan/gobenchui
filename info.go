@@ -11,6 +11,7 @@ const (
 	Starting   Status = "Starting"
 	InProgress        = "In progress"
 	Finished          = "Finished"
+	Aborted           = "Aborted"
 	Failed            = "Failed"
 )
 
@@ -18,7 +19,7 @@ const (
 type BenchmarkStatus struct {
 	Status        Status  `json:"status"`
 	Progress      float64 `json:"progress"`
-	CurrentCommit *Commit `json:"commit"`
+	CurrentCommit *Commit `json:"commit,omitempty"`
 }
 
 // Info holds information about bench session,
