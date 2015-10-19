@@ -63,7 +63,7 @@ func (g *Hg) Commits() ([]Commit, error) {
 
 	lines := strings.Split(out, "\n")
 
-	commits := parseHgCommits(lines)
+	commits := parseHgCommits(lines, time.Local)
 
 	// Filter to max entries, if specified
 	if g.filter.Max > 0 {
@@ -74,17 +74,17 @@ func (g *Hg) Commits() ([]Commit, error) {
 }
 
 // parseHgCommits parses output from `hg log` command.
-func parseHgCommits(lines []string) []Commit {
+func parseHgCommits(lines []string, location *time.Location) []Commit {
 	var commits []Commit
 	for _, str := range lines {
 		fields := strings.SplitN(str, "%", 4)
 		if len(fields) != 4 {
-			fmt.Fprintln(os.Stderr, "[ERROR] Wrong commit info, skipping: %s", str)
+			fmt.Fprintln(os.Stderr, "[ERROR] Wrong commit info, skipping:", len(fields), str)
 			continue
 		}
-		timestamp, err := time.Parse(time.RFC1123Z, fields[1])
+		timestamp, err := time.ParseInLocation(time.RFC1123Z, fields[1], location)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "[ERROR] Cannot parse timestamp: %v", err)
+			fmt.Fprintln(os.Stderr, "[ERROR] Cannot parse timestamp:", err)
 			continue
 		}
 		commit := Commit{

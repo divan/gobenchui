@@ -62,17 +62,28 @@ func (g *Git) Commits() ([]Commit, error) {
 	}
 
 	lines := strings.Split(out, "\n")
+	commits := parseGitCommits(lines, time.Local)
 
+	// Filter to max entries, if specified
+	if g.filter.Max > 0 {
+		commits = FilterMax(commits, g.filter.Max)
+	}
+
+	return commits, nil
+}
+
+// parseGitCommits parses output from `git log` command.
+func parseGitCommits(lines []string, location *time.Location) []Commit {
 	var commits []Commit
 	for _, str := range lines {
 		fields := strings.SplitN(str, "|", 4)
 		if len(fields) != 4 {
-			fmt.Fprintln(os.Stderr, "[ERROR] Wrong commit info, skipping: %s", str)
+			fmt.Fprintln(os.Stderr, "[ERROR] Wrong commit info, skipping:", len(fields), str)
 			continue
 		}
-		timestamp, err := time.Parse(RFC1123Z_git, fields[1])
+		timestamp, err := time.ParseInLocation(RFC1123Z_git, fields[1], location)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "[ERROR] Cannot parse timestamp: %v", err)
+			fmt.Fprintln(os.Stderr, "[ERROR] Cannot parse timestamp:", err)
 			continue
 		}
 		commit := Commit{
@@ -84,12 +95,7 @@ func (g *Git) Commits() ([]Commit, error) {
 		commits = append(commits, commit)
 	}
 
-	// Filter to max entries, if specified
-	if g.filter.Max > 0 {
-		commits = FilterMax(commits, g.filter.Max)
-	}
-
-	return commits, nil
+	return commits
 }
 
 // SwitchTo switches to the given commit by hash. Implements VCS interface.
