@@ -47,11 +47,14 @@ func Run(dir, command string, args ...string) (string, error) {
 
 // guessErrType tries to guess error type based on stderr and other info.
 func guessErrType(err error, stderr string) RunErrorType {
-	if strings.HasPrefix(stderr, "panic:") {
-		return PanicErr
-	}
-	if strings.HasPrefix(stderr, "# ") || strings.HasPrefix(stderr, "can't load package") {
-		return BuildFailedErr
+	lines := strings.Split(stderr, "\n")
+	if len(lines) > 2 {
+		if strings.HasPrefix(lines[0], "panic:") || strings.HasPrefix(lines[1], "panic:") {
+			return PanicErr
+		}
+		if strings.HasPrefix(lines[0], "# ") || strings.HasPrefix(lines[1], "# ") || strings.HasPrefix(lines[0], "can't load package") {
+			return BuildFailedErr
+		}
 	}
 	return OtherErr
 }
