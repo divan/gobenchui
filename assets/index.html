@@ -4,9 +4,8 @@
 	<script src="http://momentjs.com/downloads/moment.js"></script>
 	<script src="http://code.highcharts.com/highcharts.js"></script>
 	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/skeleton.css">
 	<link rel="stylesheet" type="text/css" href="/static/main.css">
-</head>
-<body>
     <script type="text/javascript">
         var sock = null;
         var wsuri = "ws://127.0.0.1:6222/ws";
@@ -49,24 +48,35 @@
 		};
 	</script>
 	<script src="/static/websocket.js"></script>
-	<h1>Go Benchmark UI</h1>
-	<div style="float: right">
-		<h2>{{ len .Commits }} commits</h2>
-		<h3>{{ with last .Commits}}{{ .Date.Format "2006-01-02" }}{{ end }} - {{ with index .Commits 1 }}{{ .Date.Format "2006-01-02" }}{{ end }}</h3>
+</head>
+<body>
+	<div class="header">
+		<h1>Go Benchmark UI</h1>
 	</div>
-	<div style="float: left">
-		<h2>{{ .PkgName }}</h2>
-		<h3>Path: {{ .PkgPath }}</h3>
+	<div class="row">
+		<div class="one-third column" style="text-align: left">
+			<h2>{{ .PkgName }}</h2>
+			<h3>Path: {{ .PkgPath }}</h3>
+		</div>
+		<div class="one-third column" style="text-align: center">
+			<h2>Status: <span id="status">{{ .Status }}</span></h2>
+			{{ if .CurrentCommit }}
+			<h5 id="commit_block">Current commit: <span id="commit">{{ .CurrentCommit.Date.Format "2006-01-02 15:04:05" }} ({{ .CurrentCommit.Subject }})<br />Hash: {{ .CurrentCommit.Hash }}</span></h5>
+			{{ end }}
+		</div>
+		<div class="one-third column" style="text-align: right">
+			<h2>{{ len .Commits }} commits</h2>
+			<h3>{{ with last .Commits}}{{ .Date.Format "2006-01-02" }}{{ end }} - {{ with index .Commits 1 }}{{ .Date.Format "2006-01-02" }}{{ end }}</h3>
+		</div>
 	</div>
-	<div style="text-align: center">
-		<h2>Status: <span id="status">{{ .Status }}</span></h2>
-		{{ if .CurrentCommit }}
-		<h5 id="commit_block">Current commit: <span id="commit">{{ .CurrentCommit.Date.Format "2006-01-02 15:04:05" }} ({{ .CurrentCommit.Subject }})<br />Hash: {{ .CurrentCommit.Hash }}</span></h5>
-		{{ end }}
+	<div class="row">
+		<div class="bordered" id="time_benchmark"></div>
+		<div class="bordered" id="mem_benchmark"></div>
 	</div>
-	<div class="container">
-		<div class="half" id="time_benchmark"></div>
-		<div class="half" id="mem_benchmark"></div>
+	<div class="footer">
+		<hr />
+		<p>generated with <a href="http://github.com/divan/gobenchui" target="_blank">gobenchui</a> by <a href="http://github.com/divan" target="_blank">divan</a></p>
+	</div>
 	</div>
 </body>
 </html>
