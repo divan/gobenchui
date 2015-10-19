@@ -92,6 +92,7 @@ func (i *Info) SetStatus(status Status) {
 func (i *Info) AddResult(b BenchmarkSet) {
 	i.mx.Lock()
 	defer i.mx.Unlock()
+
 	i.BenchResults = append(i.BenchResults, b)
 	if i.TimeSeries == nil {
 		i.TimeSeries = &HighchartsData{}

@@ -18,6 +18,8 @@ type WSData struct {
 
 	Commit    Commit    `json:"commit,omitempty"`
 	StartTime time.Time `json:"start_time,omitempty"`
+
+	Error error `json:"error,omitempty"`
 }
 
 // wshandler is a handler for websocket connection.
@@ -40,10 +42,10 @@ func wshandler(ws *websocket.Conn, pool *WSPool) {
 		case BenchmarkRun:
 			status := val.(BenchmarkRun)
 			data = WSData{
-				Type:      "status",
-				Status:    InProgress,
-				Commit:    status.Commit,
-				StartTime: status.StartTime,
+				Type:   "status",
+				Status: InProgress,
+				Commit: status.Commit,
+				Error:  status.Error,
 			}
 		case BenchmarkStatus:
 			status := val.(BenchmarkStatus)

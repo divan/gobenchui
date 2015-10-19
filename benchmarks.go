@@ -12,6 +12,7 @@ import (
 type BenchmarkSet struct {
 	Commit Commit    `json:"commit"`
 	Set    parse.Set `json:"set"`
+	Error  error     `json:"-"`
 }
 
 // BenchmarkRun represents current state of benchmark being run.

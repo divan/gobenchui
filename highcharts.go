@@ -1,5 +1,9 @@
 package main
 
+import (
+	"strings"
+)
+
 // HighchartsData holds series data in format
 // compatible with highcharts js.
 // To be used with html templates.
@@ -15,11 +19,17 @@ type Serie struct {
 	Data []*Point `json:"data"`
 }
 
-// Point represents single data point.
+// Point represents single data point in highchart.js.
 // Name should be the name/id of commit.
 type Point struct {
-	Name  string   `json:"name"`
-	Value *float64 `json:"y"`
+	Name   string   `json:"name"`
+	Value  *float64 `json:"y"`
+	Marker *Marker  `json:"marker,omitempty"`
+}
+
+// Marker is an icon marker for points.
+type Marker struct {
+	Symbol string `json:"symbol,omitempty"`
 }
 
 // AddResult adds and converts benchmark set into
@@ -41,6 +51,30 @@ func (d *HighchartsData) AddResult(b BenchmarkSet, typ string) {
 			}
 		}
 		return nil
+	}
+
+	// Add error values for all series on error
+	if b.Error != nil {
+		for _, serie := range d.Series {
+			value := 0.0
+
+			// choose different icons for build error and panic error
+			symbol := "url(/static/warning.png)"
+			if er, ok := b.Error.(*RunError); ok {
+				if strings.HasPrefix(er.Message, "exit status 1") {
+					symbol = "url(/static/panic.png)"
+				}
+			}
+			point := &Point{
+				Name:  pointName,
+				Value: &value,
+				Marker: &Marker{
+					Symbol: symbol,
+				},
+			}
+			serie.Data = append(serie.Data, point)
+		}
+		return
 	}
 
 	for name, bench := range b.Set {

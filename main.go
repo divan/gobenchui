@@ -96,6 +96,14 @@ func main() {
 					info.SetStatus(InProgress)
 				}
 				if status, ok := val.(BenchmarkRun); ok {
+					// On error, insert error marker instead result
+					if status.Error != nil {
+						res := BenchmarkSet{
+							Commit: status.Commit,
+							Error:  status.Error,
+						}
+						info.AddResult(res)
+					}
 					info.SetStatus(InProgress)
 					info.SetCommit(&status.Commit)
 				}
