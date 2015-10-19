@@ -92,10 +92,16 @@ I didn't test heavily that part, so there may be some bugs or corner cases I'm n
 
 ## Known issues
 
- * in case where latest commits has broken test, they will not appear in chart (issue 1)
+ * in case where latest commits has broken test, they will not appear in chart
  * may be issues with internal/ subpackages
- * chart icons for errors aren't exported correctly (issue 2)
+ * chart icons for errors aren't exported correctly
 
- ## Contribute
+## Contribute
  
 My frontend JS code sucks, because I'm not frontend developer, so if you want to design and implement new better web UI - you're more than welcome.
+
+Make sure to run `go generate` to regenerate assets. Or use GOBENCHUI_DEV env variable to read assets from filesystem.
+
+## License
+
+This program is under [WTFPL license](http://www.wtfpl.net)
