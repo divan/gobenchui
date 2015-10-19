@@ -13,8 +13,9 @@ type WSData struct {
 	Type   string       `json:"type"` // "status" or "result"
 	Result BenchmarkSet `json:"result,omitempty"`
 
-	Status    Status    `json:"status,omitempty"`
-	Progress  float64   `json:"progress,omitempty"`
+	Status   Status  `json:"status,omitempty"`
+	Progress float64 `json:"progress,omitempty"`
+
 	Commit    Commit    `json:"commit,omitempty"`
 	StartTime time.Time `json:"start_time,omitempty"`
 }
@@ -34,17 +35,27 @@ func wshandler(ws *websocket.Conn, pool *WSPool) {
 		}
 
 		var data WSData
-		if status, ok := val.(BenchmarkRun); ok {
+
+		switch val.(type) {
+		case BenchmarkRun:
+			status := val.(BenchmarkRun)
 			data = WSData{
 				Type:      "status",
 				Status:    InProgress,
 				Commit:    status.Commit,
 				StartTime: status.StartTime,
 			}
-		} else if set, ok := val.(BenchmarkSet); ok {
+		case BenchmarkStatus:
+			status := val.(BenchmarkStatus)
+			data = WSData{
+				Type:     "status",
+				Status:   status.Status,
+				Progress: status.Progress,
+			}
+		case BenchmarkSet:
 			data = WSData{
 				Type:   "result",
-				Result: set,
+				Result: val.(BenchmarkSet),
 				Status: InProgress,
 			}
 		}

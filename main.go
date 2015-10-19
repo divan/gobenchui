@@ -51,13 +51,11 @@ func main() {
 	}
 
 	// Remove temporary directory in the end
-	cleanup := func(path string) {
-		err := os.RemoveAll(path)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "Couldn't delete temp dir:", err)
-		}
+	cleanup := func() {
+		path := vcs.Workspace().Root()
+		os.RemoveAll(path)
 	}
-	defer cleanup(vcs.Workspace().Root())
+	defer cleanup()
 
 	// Prepare commits to run benchmarks agains
 	commits, err := vcs.Commits()
@@ -83,11 +81,22 @@ func main() {
 			case val, ok := <-ch:
 				if !ok {
 					info.SetStatus(Finished)
+					info.SetCommit(nil)
+					webCh <- BenchmarkStatus{
+						Status:   Finished,
+						Progress: 100.0,
+					}
+					fmt.Println("[INFO] Finished, cleaning up.")
+					cleanup()
 					return
 				}
 				if result, ok := val.(BenchmarkSet); ok {
 					info.AddResult(result)
 					info.SetStatus(InProgress)
+				}
+				if status, ok := val.(BenchmarkRun); ok {
+					info.SetStatus(InProgress)
+					info.SetCommit(&status.Commit)
 				}
 
 				webCh <- val
@@ -97,10 +106,12 @@ func main() {
 
 	go StartServer(*bind, webCh, info)
 
+	// don't exit, even after all benchmarks had been completed,
+	// as we need to keep serve web page
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, os.Kill)
 	<-sigCh
-	fmt.Println("Got signal, cleaning up")
+	fmt.Println("Got signal, exiting...")
 }
 
 // Usage prints program usage text.

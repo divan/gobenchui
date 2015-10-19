@@ -27,8 +27,12 @@
 
 							if (msg.type === 'status') {
 								document.getElementById('status').innerHTML = msg.status;
-								date = moment(msg.commit.date).format('YYYY-MM-DD HH:mm:ss');
-								document.getElementById('commit').innerHTML = date + ' (' + msg.commit.subject + ')' + '<br />' + 'Hash: ' + msg.commit.hash;
+								if (msg.status === "Finished") {
+									document.getElementById('commit_block').style.visibility = "hidden";
+								} else {
+									date = moment(msg.commit.date).format('YYYY-MM-DD HH:mm:ss');
+									document.getElementById('commit').innerHTML = date + ' (' + msg.commit.subject + ')' + '<br />' + 'Hash: ' + msg.commit.hash;
+								};
 							} else if (msg.type === 'result') {
 								result = msg.result;
 								$.each(result.set, function(key, value) {
@@ -41,7 +45,6 @@
 									};
 
 									var series = self.get(bench.Name);
-									console.log("series", bench.Name, series);
 									if (series) { // series already exists
 										series.addPoint(item, true, false);
 									} else { //  new series
@@ -97,12 +100,12 @@
 			{{ if .Series }} {{ .Series | json_stripped }} {{ end }}
 		};
 
-        window.onload = function() {
+		window.onload = function() {
 			var chart = $('#container').highcharts(options);
-        };
+		};
 
-    </script>
-    <h1>Go Benchmark UI</h1>
+	</script>
+	<h1>Go Benchmark UI</h1>
 	<div style="float: right">
 		<h2>{{ len .Commits }} commits</h2>
 		<h3>{{ with last .Commits}}{{ .Date.Format "2006-01-02" }}{{ end }} - {{ with index .Commits 1 }}{{ .Date.Format "2006-01-02" }}{{ end }}</h3>
@@ -112,8 +115,10 @@
 		<h3>Path: {{ .PkgPath }}</h3>
 	</div>
 	<div style="text-align: center">
-		<h2>Status: <span id="status">Starting...</span></h2>
-		<h5>Current commit: <span id="commit"></span></h5>
+		<h2>Status: <span id="status">{{ .Status }}</span></h2>
+		{{ if .CurrentCommit }}
+		<h5 id="commit_block">Current commit: <span id="commit">{{ .CurrentCommit.Date.Format "2006-01-02 15:04:05" }} ({{ .CurrentCommit.Subject }})<br />Hash: {{ .CurrentCommit.Hash }}</span></h5>
+		{{ end }}
 	</div>
 	<div id="container"></div>
 </body>

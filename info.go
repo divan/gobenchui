@@ -8,19 +8,25 @@ import (
 type Status string
 
 const (
-	Undefined  Status = "Undefined"
+	Starting   Status = "Starting"
 	InProgress        = "In progress"
 	Finished          = "Finished"
 	Failed            = "Failed"
 )
+
+// BenchmarkStatus holds details of current status.
+type BenchmarkStatus struct {
+	Status        Status  `json:"status"`
+	Progress      float64 `json:"progress"`
+	CurrentCommit *Commit `json:"commit"`
+}
 
 // Info holds information about bench session,
 // like pkg name, start time, progress, status, etc.
 type Info struct {
 	mx *sync.RWMutex
 
-	Status   Status  `json:"status"`
-	Progress float64 `json:"progress"`
+	BenchmarkStatus
 
 	PkgName string `json:"pkg_name"`
 	PkgPath string `json:"pkg_path"`
@@ -41,8 +47,10 @@ func NewInfo(pkg, path, vcs, benchopts string, commits []Commit) *Info {
 	return &Info{
 		mx: &sync.RWMutex{},
 
-		Status:   Undefined,
-		Progress: 0.0,
+		BenchmarkStatus: BenchmarkStatus{
+			Status:   Starting,
+			Progress: 0.0,
+		},
 
 		PkgName: pkg,
 		PkgPath: path,
@@ -59,6 +67,13 @@ func NewInfo(pkg, path, vcs, benchopts string, commits []Commit) *Info {
 func (i *Info) SetProgress(v float64) {
 	i.mx.Lock()
 	i.Progress = v
+	i.mx.Unlock()
+}
+
+// SetCommit is a setter for Current Commit value.
+func (i *Info) SetCommit(commit *Commit) {
+	i.mx.Lock()
+	i.CurrentCommit = commit
 	i.mx.Unlock()
 }
 
