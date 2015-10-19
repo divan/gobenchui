@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -8,7 +9,8 @@ import (
 // compatible with highcharts js.
 // To be used with html templates.
 type HighchartsData struct {
-	Series []*Serie `json:"series,omitempty"`
+	Categories []Commit `json:"categories,omitempty"`
+	Series     []*Serie `json:"series,omitempty"`
 }
 
 // Serie is a single serie object.
@@ -32,14 +34,24 @@ type Marker struct {
 	Symbol string `json:"symbol,omitempty"`
 }
 
+// xvalue mirrors xvalue() func in js code,
+// it formats commit to serve as an X value for
+// charts
+func xvalue(commit Commit) string {
+	date := commit.Date.Format("06-01-02")
+	var hash string
+	if len(commit.Hash) > 6 {
+		hash = commit.Hash[0:6]
+	}
+	return fmt.Sprintf("%s %s", date, hash)
+}
+
 // AddResult adds and converts benchmark set into
 // highcharts-compatible representation of series/points.
 //
 // typ defines which result goes to this serie: "time" or "memory"
 func (d *HighchartsData) AddResult(b BenchmarkSet, typ string) {
-	// we currently use commit date as a point
-	// X value, stick for it for a while
-	pointName := b.Commit.Date.Format("2006-01-02 15:04:05")
+	pointName := xvalue(b.Commit)
 
 	findSerie := func(name string) *Serie {
 		if d.Series == nil {

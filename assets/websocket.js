@@ -10,6 +10,7 @@ sock.onmessage = function(e) {
 
 	if (msg.type === 'status') {
 		date = moment(msg.commit.date).format('YYYY-MM-DD HH:mm:ss');
+		name = xvalue(msg.commit);
 		document.getElementById('status').innerHTML = msg.status;
 
 		// hide loader if not 'in progress'
@@ -27,7 +28,7 @@ sock.onmessage = function(e) {
 			}
 
 			item = {
-				name: date,
+				name: name,
 				y: 0,
 				marker: { symbol: marker }
 			};
@@ -50,11 +51,12 @@ sock.onmessage = function(e) {
 		$.each(result.set, function(key, value) {
 			var bench = value[0];
 			date = moment(result.commit.date).format('YYYY-MM-DD HH:mm:ss');
+			name = xvalue(result.commit);
 
 			// time chart data
 			{
 				item = {
-					name: date,
+					name: name,
 					y: bench.NsPerOp,
 				};
 
@@ -73,7 +75,7 @@ sock.onmessage = function(e) {
 			// memory chart data
 			{
 				item = {
-					name: date,
+					name: name,
 					y: bench.AllocedBytesPerOp,
 				};
 
@@ -95,14 +97,14 @@ sock.onmessage = function(e) {
 		$.each(chart_time.series, function(index, serie) {
 			found = false;
 			$.each(serie.data, function(idx, item) {
-				if (item.name == date) {
+				if (item.name == name) {
 					found = true;
 					return false;
 				}
 			});
 			if (!found) {
 				serie.addPoint({
-					name: date,
+					name: name,
 					y: null,
 				}, true, false)
 			};
@@ -113,14 +115,14 @@ sock.onmessage = function(e) {
 		$.each(chart_mem.series, function(index, serie) {
 			found = false;
 			$.each(serie.data, function(idx, item) {
-				if (item.name == date) {
+				if (item.name == name) {
 					found = true;
 					return false;
 				}
 			});
 			if (!found) {
 				serie.addPoint({
-					name: date,
+					name: name,
 					y: null,
 				}, true, false)
 			};

@@ -64,6 +64,9 @@ func NewInfo(pkg, path, vcs, benchopts string, filter *FilterOptions, commits []
 		Filter:       filter.String(),
 		Commits:      commits,
 
+		TimeSeries: &HighchartsData{Categories: commits},
+		MemSeries:  &HighchartsData{Categories: commits},
+
 		StartTime: time.Now(),
 	}
 }
@@ -98,13 +101,6 @@ func (i *Info) AddResult(b BenchmarkSet) {
 	defer i.mx.Unlock()
 
 	i.BenchResults = append(i.BenchResults, b)
-	if i.TimeSeries == nil {
-		i.TimeSeries = &HighchartsData{}
-	}
 	i.TimeSeries.AddResult(b, "time")
-
-	if i.MemSeries == nil {
-		i.MemSeries = &HighchartsData{}
-	}
 	i.MemSeries.AddResult(b, "memory")
 }

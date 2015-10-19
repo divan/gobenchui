@@ -10,18 +10,49 @@
         var sock = null;
         var wsuri = "ws://127.0.0.1:6222/ws";
 
+		function xvalue(commit) {
+			date = moment(commit.date).format('YY-MM-DD');
+			return date + '<br/>' + commit.hash.substring(0,6);
+		}
+
 		var options_time = {
 			chart: { type: 'spline', connectNulls: true, },
 			title: { text: "{{ .PkgName }}" },
 			subtitle: { text: "time benchmark (ns/op)" },
-			xAxis: { reversed: true, categories: [], },
+			xAxis: {
+				reversed: true,
+				categories: {{ .TimeSeries.Categories | json_stripped }},
+				labels: {
+					formatter: function () {
+						return xvalue(this.value);
+					}
+				}
+			},
 			yAxis: {
 				labels: {
 					title: { text: "Time" },
 					formatter: function () { return this.value + 'ns'; }
 				}
 			},
-			tooltip: { crosshairs: true, shared: true },
+			tooltip: {
+				crosshairs: true,
+				shared: true,
+				formatter: function() {
+					date = moment(this.x.date).format('YY-MM-DD hh:mm:ss Z');
+					var s = '<b>' + this.x.subject + '</b><br />';
+					s += '<b>' + date + '</b><br />';
+					s += '<b>' + this.x.hash + '</b><br />';
+					s += '<b>' + this.x.author + '</b><br />';
+					s += '<br />';
+
+					$.each(this.points, function () {
+						s += '<br/>' + this.series.name + ': ' +
+							this.y + ' ns/op';
+					});
+
+					return s;
+				}
+			},
 			{{ if .TimeSeries }} {{ .TimeSeries | json_stripped }} {{ end }}
 		};
 
@@ -29,14 +60,40 @@
 			chart: { type: 'spline', connectNulls: true, },
 			title: { text: "{{ .PkgName }}" },
 			subtitle: { text: "memory benchmark (B/op)" },
-			xAxis: { reversed: true, categories: [], },
+			xAxis: {
+			   	reversed: true,
+				categories: {{ .MemSeries.Categories | json_stripped }},
+				labels: {
+					formatter: function () {
+						return xvalue(this.value);
+					}
+				}
+			},
 			yAxis: {
 				labels: {
 					title: { text: "Memory" },
 					formatter: function () { return this.value + 'B'; }
 				}
 			},
-			tooltip: { crosshairs: true, shared: true },
+			tooltip: {
+				crosshairs: true,
+				shared: true,
+				formatter: function() {
+					date = moment(this.x.date).format('YY-MM-DD hh:mm:ss Z');
+					var s = '<b>' + this.x.subject + '</b><br />';
+					s += '<b>' + date + '</b><br />';
+					s += '<b>' + this.x.hash + '</b><br />';
+					s += '<b>' + this.x.author + '</b><br />';
+					s += '<br />';
+
+					$.each(this.points, function () {
+						s += '<br/>' + this.series.name + ': ' +
+							this.y + ' ns/op';
+					});
+
+					return s;
+				}
+			},
 			{{ if .MemSeries }} {{ .MemSeries | json_stripped }} {{ end }}
 		};
 
