@@ -23,7 +23,7 @@ sock.onmessage = function(e) {
 			// TODO: these icons somehow doesn't work with exported highcharts.js png/jpg
 			// find out why (already spent 2 hours) and replace with working ones.
 			marker = 'url(/static/warning.png)';
-			if (msg.error.Message === 'exit status 1') {
+			if (msg.error.Type === 'panic') {
 				marker = 'url(/static/panic.png)';
 			}
 

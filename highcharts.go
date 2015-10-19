@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 )
 
 // HighchartsData holds series data in format
@@ -73,7 +72,7 @@ func (d *HighchartsData) AddResult(b BenchmarkSet, typ string) {
 			// choose different icons for build error and panic error
 			symbol := "url(/static/warning.png)"
 			if er, ok := b.Error.(*RunError); ok {
-				if strings.HasPrefix(er.Message, "exit status 1") {
+				if er.Type == PanicErr {
 					symbol = "url(/static/panic.png)"
 				}
 			}
