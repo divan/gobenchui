@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 )
 
 var (
@@ -28,12 +27,14 @@ func main() {
 	}
 
 	pkg := flag.Arg(0)
-	path, err := getAbsPath(pkg)
+	gopath := GOPATH()
+	path, err := absPath(pkg, gopath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to find package:", err)
 		os.Exit(1)
 	}
-	fmt.Println("Benchmarking package", path)
+	pkg = normalizePkgName(pkg, path, gopath)
+	fmt.Println("Benchmarking package", pkg)
 
 	var vcs VCS
 	filter := NewFilterOptions(*lastN, *max, *vcsArgs)
@@ -118,16 +119,4 @@ func main() {
 func Usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s package\n", os.Args[0])
 	flag.PrintDefaults()
-}
-
-// getAbsPath returns absolute path to package to be benchmarked.
-// For package names it looks for them in GOPATH.
-// For '.' it resolves current working directory.
-func getAbsPath(pkg string) (string, error) {
-	if pkg == "." {
-		return os.Getwd()
-	}
-
-	path := filepath.Join(GOPATH(), "src", pkg)
-	return path, nil
 }
