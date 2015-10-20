@@ -99,7 +99,7 @@ I didn't test heavily that part, so there may be some bugs or corner cases I'm n
 
 ## Contribute
  
-My frontend JS code sucks, because I'm not frontend developer, so if you want to design and implement new better web UI - you're more than welcome.
+My frontend JS code sucks, just because, so if you want to design and implement new better web UI - you're more than welcome.
 
 Make sure to run `go generate` to regenerate assets. Or use GOBENCHUI_DEV env variable to read assets from filesystem.
 
