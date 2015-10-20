@@ -22,7 +22,7 @@ var once sync.Once
 // GO15VENDOREXPERIMENT work correctly.
 func honourVendorExperiment(workspace *Workspace) {
 	once.Do(func() {
-		if v, ok := os.LookupEnv("GO15VENDOREXPERIMENT"); ok && v == "1" {
+		if v := os.Getenv("GO15VENDOREXPERIMENT"); v == "1" {
 			gopath := os.Getenv("GOPATH")
 			gopath = fmt.Sprintf("%s:%s", gopath, workspace.Gopath())
 			fmt.Println("[INFO] Detected GO15VENDOREXPERIMENT, setting GOPATH to", gopath)

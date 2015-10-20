@@ -8,8 +8,8 @@ import (
 
 // GOPATH extracts first gopath from your env variable GOPATH.
 func GOPATH() string {
-	gopath, ok := os.LookupEnv("GOPATH")
-	if !ok {
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
 		fmt.Fprintf(os.Stderr, "GOPATH not set, aborting")
 		os.Exit(1)
 	}
