@@ -8,6 +8,7 @@ import (
 // Status represents a benchmark status.
 type Status string
 
+// Process statuses.
 const (
 	Starting   Status = "Starting"
 	InProgress        = "In progress"

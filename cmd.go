@@ -17,6 +17,7 @@ type RunError struct {
 // RunErrorType is a subtype for run error.
 type RunErrorType string
 
+// Errors messages.
 const (
 	PanicErr        RunErrorType = "panic"
 	BuildFailedErr               = "build_failed"
