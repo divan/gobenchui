@@ -1,6 +1,8 @@
 
 # GoBenchUI
 
+[![Build Status](https://drone.io/github.com/divan/gobenchui/status.png)](https://drone.io/github.com/divan/gobenchui/latest)
+
 UI for overview of your package benchmarks progress.
 
 ## Intro
