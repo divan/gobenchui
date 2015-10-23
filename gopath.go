@@ -13,6 +13,6 @@ func GOPATH() string {
 		fmt.Fprintf(os.Stderr, "GOPATH not set, aborting")
 		os.Exit(1)
 	}
-	paths := strings.Split(gopath, ":")
+	paths := strings.Split(gopath, string(os.PathListSeparator))
 	return paths[0]
 }
