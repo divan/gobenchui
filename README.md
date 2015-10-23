@@ -32,12 +32,12 @@ Just go get it:
 
 To run benchmarks, simply specify package name:
 
-    gobenchui github.com/divan/gobenchui/example
+    gobenchui -last 10 github.com/jackpal/bencode-go
 
 or, if you're inside this directory, use `.`:
 
-    cd $GOPATH/github.com/divan/gobenchui/example
-    gobenchui .
+    cd $GOPATH/github.com/jackpal/bencode-go
+    gobenchui -last 10 .
 
 Browser will pops up. If not, follow instructions printed to console.
 
