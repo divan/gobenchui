@@ -5,6 +5,7 @@ sock.onclose = function(e) { console.log("connection closed (" + e.code + ")"); 
 sock.onmessage = function(e) {
 	var chart_time = $('#time_benchmark').highcharts();
 	var chart_mem = $('#mem_benchmark').highcharts();
+	var chart_alloc = $('#alloc_benchmark').highcharts();
 	
 	msg = JSON.parse(e.data);
 
@@ -37,6 +38,9 @@ sock.onmessage = function(e) {
 				serie.addPoint(item, true, false);
 			});
 			$.each(chart_mem.series, function(index, serie) {
+				serie.addPoint(item, true, false);
+			});
+			$.each(chart_alloc.series, function(index, serie) {
 				serie.addPoint(item, true, false);
 			});
 		};
@@ -90,6 +94,25 @@ sock.onmessage = function(e) {
 					});
 				}
 			}
+
+			// allocs chart data
+			{
+				item = {
+					name: name,
+					y: bench.AllocsPerOp,
+				};
+
+				series = chart_alloc.get(bench.Name);
+				if (series) { // series already exists
+					series.addPoint(item, true, false);
+				} else { //  new series
+					chart_alloc.addSeries({
+						data: [item],
+						id: bench.Name,
+						name: bench.Name,
+					});
+				}
+			}
 		});
 
 		// Now, iterate over known series, and insert nulls
@@ -113,6 +136,22 @@ sock.onmessage = function(e) {
 		// The same for memory chart
 		// TODO: move to separated function
 		$.each(chart_mem.series, function(index, serie) {
+			found = false;
+			$.each(serie.data, function(idx, item) {
+				if (item.name == name) {
+					found = true;
+					return false;
+				}
+			});
+			if (!found) {
+				serie.addPoint({
+					name: name,
+					y: null,
+				}, true, false)
+			};
+		});
+
+		$.each(chart_alloc.series, function(index, serie) {
 			found = false;
 			$.each(serie.data, function(idx, item) {
 				if (item.name == name) {

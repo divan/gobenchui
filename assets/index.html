@@ -61,7 +61,7 @@
 			title: { text: "{{ .PkgName }}" },
 			subtitle: { text: "memory benchmark (B/op)" },
 			xAxis: {
-			   	reversed: true,
+			  reversed: true,
 				categories: {{ .MemSeries.Categories | json_stripped }},
 				labels: {
 					formatter: function () {
@@ -97,11 +97,54 @@
 			{{ if .MemSeries }} {{ .MemSeries | json_stripped }} {{ end }}
 		};
 
+		var options_alloc = {
+			chart: { type: 'spline', connectNulls: true, },
+			title: { text: "{{ .PkgName }}" },
+			subtitle: { text: "allocations benchmark (allocs/op)" },
+			xAxis: {
+        reversed: true,
+				categories: {{ .AllocSeries.Categories | json_stripped }},
+				labels: {
+					formatter: function () {
+						return xvalue(this.value);
+					}
+				}
+			},
+			yAxis: {
+				labels: {
+					title: { text: "Allocations" },
+					formatter: function () { return this.value; }
+				}
+			},
+			tooltip: {
+				crosshairs: true,
+				shared: true,
+				formatter: function() {
+					date = moment(this.x.date).format('YY-MM-DD hh:mm:ss Z');
+					var s = '<b>' + this.x.subject + '</b><br />';
+					s += '<b>' + date + '</b><br />';
+					s += '<b>' + this.x.hash + '</b><br />';
+					s += '<b>' + this.x.author + '</b><br />';
+					s += '<br />';
+
+					$.each(this.points, function () {
+						s += '<br/>' + this.series.name + ': ' +
+							this.y + ' allocs/op';
+					});
+
+					return s;
+				}
+			},
+			{{ if .AllocSeries }} {{ .AllocSeries | json_stripped }} {{ end }}
+		};
+
 		window.onload = function() {
 			$('#time_benchmark').highcharts(options_time);
 			$('#mem_benchmark').highcharts(options_mem);
+			$('#alloc_benchmark').highcharts(options_alloc);
 			var chart_time = $('#time_benchmark').highcharts();
 			var chart_mem = $('#mem_benchmark').highcharts();
+			var chart_alloc = $('#alloc_benchmark').highcharts();
 		};
 	</script>
 	<script src="/static/websocket.js"></script>
@@ -131,6 +174,7 @@
 	<div class="row">
 		<div class="bordered" id="time_benchmark"></div>
 		<div class="bordered" id="mem_benchmark"></div>
+		<div class="bordered" id="alloc_benchmark"></div>
 	</div>
 	<div class="footer">
 		<p>generated with <a href="http://github.com/divan/gobenchui" target="_blank">gobenchui</a> by <a href="http://github.com/divan" target="_blank">divan</a></p>

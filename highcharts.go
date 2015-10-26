@@ -48,7 +48,7 @@ func xvalue(commit Commit) string {
 // AddResult adds and converts benchmark set into
 // highcharts-compatible representation of series/points.
 //
-// typ defines which result goes to this serie: "time" or "memory"
+// typ defines which result goes to this serie: "time" or "memory" or "alloc"
 func (d *HighchartsData) AddResult(b BenchmarkSet, typ string) {
 	pointName := xvalue(b.Commit)
 
@@ -104,6 +104,9 @@ func (d *HighchartsData) AddResult(b BenchmarkSet, typ string) {
 			point.Value = &(bench[0].NsPerOp)
 		case "memory":
 			val := float64(bench[0].AllocedBytesPerOp)
+			point.Value = &val
+		case "alloc":
+			val := float64(bench[0].AllocsPerOp)
 			point.Value = &val
 		}
 		serie.Data = append(serie.Data, point)
