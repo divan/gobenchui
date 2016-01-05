@@ -31,7 +31,7 @@ func StartServer(bind string, ch chan interface{}, info *Info) error {
 	if DevMode() {
 		fs = http.Dir("assets")
 	} else {
-		fs = &assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, Prefix: "assets"}
+		fs = &assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "assets"}
 	}
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(fs)))
 
