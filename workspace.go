@@ -128,12 +128,12 @@ func makeWalkFn(dst, src string) filepath.WalkFunc {
 		if info.IsDir() {
 			return os.Mkdir(dstPath, info.Mode())
 		}
-		if(info.Mode()&os.ModeSymlink == os.ModeSymlink){
-			if newPath, err := os.Readlink(path); err != nil{
+		if info.Mode()&os.ModeSymlink == os.ModeSymlink {
+			if newPath, err := os.Readlink(path); err != nil {
 				return err
-			}else{
+			} else {
 				path = newPath
-				if info, err = os.Lstat(path); err != nil{
+				if info, err = os.Lstat(path); err != nil {
 					return err
 				}
 			}
