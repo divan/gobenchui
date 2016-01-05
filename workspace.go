@@ -129,8 +129,14 @@ func makeWalkFn(dst, src string) filepath.WalkFunc {
 			return os.Mkdir(dstPath, info.Mode())
 		}
 		if(info.Mode()&os.ModeSymlink == os.ModeSymlink){
-			//skip symbolic links
-			return nil
+			if newPath, err := os.Readlink(path); err != nil{
+				return err
+			}else{
+				path = newPath
+				if info, err = os.Lstat(path); err != nil{
+					return err
+				}
+			}
 		}
 		return copyFile(dstPath, path)
 	}
