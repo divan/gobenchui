@@ -132,9 +132,23 @@ func makeWalkFn(dst, src string) filepath.WalkFunc {
 			if newPath, err := os.Readlink(path); err != nil {
 				return err
 			} else {
-				path = newPath
+				if newPath[0] != '/' {
+					// Relative symlink
+					path = filepath.Join(filepath.Dir(path), newPath)
+				} else {
+					path = newPath
+				}
+
 				if info, err = os.Lstat(path); err != nil {
 					return err
+				}
+
+				if info.IsDir() {
+					if err = os.Mkdir(dstPath, info.Mode()); err != nil {
+						return err
+					}
+					// Following the dir symlink
+					return filepath.Walk(path, makeWalkFn(dstPath, path))
 				}
 			}
 		}
