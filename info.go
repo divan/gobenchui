@@ -42,6 +42,7 @@ type Info struct {
 	BenchResults []BenchmarkSet  `json:"results"`
 	TimeSeries   *HighchartsData `json:"time_series,omitempty"`
 	MemSeries    *HighchartsData `json:"mem_series,omitempty"`
+	AllocSeries  *HighchartsData `json:"alloc_series,omitempty"`
 
 	StartTime time.Time `json:"start_time"`
 	EndTime   time.Time `json:"end_time"`
@@ -65,8 +66,9 @@ func NewInfo(pkg, path, vcs, benchopts string, filter *FilterOptions, commits []
 		Filter:       filter.String(),
 		Commits:      commits,
 
-		TimeSeries: &HighchartsData{Categories: commits},
-		MemSeries:  &HighchartsData{Categories: commits},
+		TimeSeries:  &HighchartsData{Categories: commits},
+		MemSeries:   &HighchartsData{Categories: commits},
+		AllocSeries: &HighchartsData{Categories: commits},
 
 		StartTime: time.Now(),
 	}
@@ -104,4 +106,6 @@ func (i *Info) AddResult(b BenchmarkSet) {
 	i.BenchResults = append(i.BenchResults, b)
 	i.TimeSeries.AddResult(b, "time")
 	i.MemSeries.AddResult(b, "memory")
+	i.AllocSeries.AddResult(b, "alloc")
+
 }
